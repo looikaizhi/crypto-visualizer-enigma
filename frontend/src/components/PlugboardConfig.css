@@ -1,0 +1,92 @@
+.plugboard-container {
+  margin: 20px;
+  padding: 20px;
+  background-color: #2c3e50;
+  border-radius: 10px;
+  color: #ecf0f1;
+}
+
+.plugboard-container h3 {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.error-message {
+  color: #e74c3c;
+  text-align: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: rgba(231, 76, 60, 0.2);
+  border-radius: 4px;
+}
+
+.plug-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.plug-pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #34495e;
+  border-radius: 8px;
+}
+
+.plug-select {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  cursor: pointer;
+  flex: 1;
+}
+
+.plug-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3498db;
+}
+
+.connector {
+  font-size: 20px;
+  color: #3498db;
+}
+
+.remove-pair-button {
+  padding: 8px 12px;
+  font-size: 18px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e74c3c;
+  color: #ecf0f1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.remove-pair-button:hover {
+  background-color: #c0392b;
+}
+
+.add-pair-button {
+  margin-top: 15px;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #2ecc71;
+  color: #ecf0f1;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  max-width: 600px;
+}
+
+.add-pair-button:hover {
+  background-color: #27ae60;
+} 

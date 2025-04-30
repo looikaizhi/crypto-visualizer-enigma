@@ -1,0 +1,33 @@
+.reflector-selector-container {
+  margin: 20px;
+  padding: 20px;
+  background-color: #2c3e50;
+  border-radius: 10px;
+  color: #ecf0f1;
+}
+
+.reflector-selector-container h3 {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.reflector-select-wrapper {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.reflector-select {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  cursor: pointer;
+}
+
+.reflector-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3498db;
+} 

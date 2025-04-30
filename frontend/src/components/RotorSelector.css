@@ -1,0 +1,57 @@
+.rotor-selector-container {
+  margin: 20px;
+  padding: 20px;
+  background-color: #2c3e50;
+  border-radius: 10px;
+  color: #ecf0f1;
+}
+
+.rotor-selector-container h3 {
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.rotors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.rotor-config {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  background-color: #34495e;
+  border-radius: 8px;
+}
+
+.rotor-label {
+  font-weight: bold;
+  text-align: center;
+}
+
+.rotor-select,
+.position-select {
+  padding: 8px;
+  font-size: 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  cursor: pointer;
+}
+
+.rotor-select:focus,
+.position-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #3498db;
+}
+
+@media (max-width: 768px) {
+  .rotors-grid {
+    grid-template-columns: 1fr;
+  }
+} 
