@@ -1,18 +1,19 @@
+from fastapi.responses import JSONResponse
 from component import Plugboard, Rotor, Reflector, EnigmaMachine
-#from fastapi import FastAPI
-#from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Tuple
 
-#api = FastAPI()
+app = FastAPI()
 
-"""api.add_middleware(
+app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-)"""
+)
 
 GLOBAL_ENIGMA = None
 
@@ -53,16 +54,16 @@ class EncryptResponse(BaseModel):
     ciphertext: str
     rotor_positions: List[str]
 
-#@api.get("/rotors")
+@app.get("/rotors")
 async def get_rotors():
     return ROTOR_WIRINGS
 
-#@api.get("/reflectors")
+@app.get("/reflectors")
 async def get_reflectors():
     return REFLECTOR_WIRINGS
 
-#@api.post("/encrypt", response_model=EncryptResponse)
-def encrypt(request: EncryptRequest):
+@app.post("/encrypt", response_model=EncryptResponse)
+async def encrypt(request: EncryptRequest):
     # 创建转子
     rotors = []
     for rotor_config in request.rotors:
@@ -103,7 +104,8 @@ def initialize_enigma(rotor_configs, reflector_index, plugboard_pairs):
 
     return EnigmaMachine(plugboard, rotors, reflector)
 
-def new_enigma(config_dict: dict):
+@app.post("/init")
+async def new_enigma(config_dict: dict):
     try:
         global GLOBAL_ENIGMA
         enigma = initialize_enigma(
@@ -113,37 +115,28 @@ def new_enigma(config_dict: dict):
         )
         GLOBAL_ENIGMA = enigma
         print("Success build a Enigma")
+        return {"message": "Success build a Enigma"}
     except Exception as e:
         print("initialze Enigma failed")
-        print(e)
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
-def encrypt_one_letter(letter: str) -> EncryptResponse:
-    global GLOBAL_ENIGMA
+@app.post("/encrypt-char", response_model=EncryptResponse)
+async def encrypt_one_char(letter: str) -> EncryptResponse:
+    try:
+        global GLOBAL_ENIGMA
 
-    if GLOBAL_ENIGMA is None:
-        raise Exception("Please initialize the Enigma machine")
+        if GLOBAL_ENIGMA is None:
+            raise Exception("Please initialize the Enigma machine")
 
-    # 调用单字符加密（带步进）
-    ciphertext = GLOBAL_ENIGMA.encrypt_letter(letter)
+        # 调用单字符加密（带步进）
+        ciphertext = GLOBAL_ENIGMA.encrypt_letter(letter)
 
-    # 获取转子位置（例如 ["B", "C", "D"]）
-    rotor_positions = [rotor.get_position() for rotor in GLOBAL_ENIGMA.rotors]
+        # 获取转子位置（例如 ["B", "C", "D"]）
+        rotor_positions = [rotor.get_position() for rotor in GLOBAL_ENIGMA.rotors]
 
-    return EncryptResponse(
-        ciphertext=ciphertext,
-        rotor_positions=rotor_positions
-    ) 
-
-if __name__ == "__main__":
-    encryptRequest = {
-        "plaintext": "HELLO",
-        "rotors": [
-            { "name": 0, "position": "A" },
-            { "name": 1, "position": "B" },
-            { "name": 2, "position": "C" }
-        ],
-        "reflector": 1,
-        "plugboard": [["A", "M"], ["B", "N"]]
-    }
-    
-    print(encrypt(EncryptRequest(**encryptRequest)))
+        return EncryptResponse(
+            ciphertext=ciphertext,
+            rotor_positions=rotor_positions
+        ) 
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
