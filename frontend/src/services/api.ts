@@ -6,9 +6,20 @@ interface InitResponse{
   message: string;
 }
 
-export interface Rotor {
-  name: number;
+export interface Rotor{
+  index: string;
+  wiring: string;
+}
+
+export interface RotorSelection {
+  index: string;
+  wiring: string;
   position: string;
+}
+
+export interface Reflector {
+  index: string;
+  wiring: string;
 }
 
 export interface PlugPair {

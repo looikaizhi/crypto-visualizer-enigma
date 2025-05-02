@@ -1,9 +1,14 @@
 import React from 'react';
 import './ReflectorSelector.css';
 
+interface Reflector {
+  index: string;
+  wiring: string;
+}
+
 interface ReflectorSelectorProps {
   selectedReflector: string;
-  availableReflectors: string[];
+  availableReflectors: Reflector[];
   onReflectorChange: (reflector: string) => void;
 }
 
@@ -22,8 +27,8 @@ const ReflectorSelector: React.FC<ReflectorSelectorProps> = ({
           className="reflector-select"
         >
           {availableReflectors.map((name) => (
-            <option key={name} value={name}>
-              反射器 {name}
+            <option key={name.index} value={name.wiring}>
+              反射器 {name.index}
             </option>
           ))}
         </select>

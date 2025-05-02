@@ -4,16 +4,16 @@ import LampBoard from './LampBoard';
 import RotorSelector from './RotorSelector';
 import ReflectorSelector from './ReflectorSelector';
 import PlugboardConfig from './PlugboardConfig';
-import api, { Rotor, PlugPair } from '../services/api';
+import api, { Rotor, PlugPair, Reflector, RotorSelection } from '../services/api';
 import './EnigmaSimulator.css';
 
 const EnigmaSimulator: React.FC = () => {
-  const [availableRotors, setAvailableRotors] = useState<string[]>([]);
-  const [availableReflectors, setAvailableReflectors] = useState<string[]>([]);
-  const [selectedRotors, setSelectedRotors] = useState<Rotor[]>([
-    { name: 'I', position: 'A' },
-    { name: 'II', position: 'A' },
-    { name: 'III', position: 'A' },
+  const [availableRotors, setAvailableRotors] = useState<Rotor[]>([]);
+  const [availableReflectors, setAvailableReflectors] = useState<Reflector[]>([]);
+  const [selectedRotors, setSelectedRotors] = useState<RotorSelection[]>([
+    {index:"", wiring: "", position: 'A' },
+    {index:"", wiring: "", position: 'A' },
+    {index:"", wiring: "", position: 'A' },
   ]);
   const [selectedReflector, setSelectedReflector] = useState<string>('B');
   const [plugPairs, setPlugPairs] = useState<PlugPair[]>([{ from: '', to: '' }]);
@@ -25,12 +25,26 @@ const EnigmaSimulator: React.FC = () => {
   useEffect(() => {
     const initializeEnigma = async () => {
       try {
+        // 获取可用的转子和反射器
         const [rotors, reflectors] = await Promise.all([
           api.getRotors(),
           api.getReflectors(),
         ]);
-        setAvailableRotors(rotors);
-        setAvailableReflectors(reflectors);
+        console.log(rotors, reflectors);
+        // 转换 rotors 数据为数组
+        const rotorArray = Object.entries(rotors).map(([index, wiring]) => ({
+          index,
+          wiring: wiring as string,
+        }));
+
+        // 转换 reflectors 数据为数组
+        const reflectorArray = Object.entries(reflectors).map(([index, wiring]) => ({
+          index,
+          wiring: wiring as string,
+        }));
+
+        setAvailableRotors(rotorArray);
+        setAvailableReflectors(reflectorArray);
         setIsLoading(false);
       } catch (err) {
         setError('初始化失败，请刷新页面重试');
@@ -41,6 +55,7 @@ const EnigmaSimulator: React.FC = () => {
     initializeEnigma();
   }, []);
 
+  // 处理键盘输入
   const handleKeyPress = async (letter: string) => {
     try {
       const plugboardPairs = plugPairs
@@ -74,9 +89,10 @@ const EnigmaSimulator: React.FC = () => {
     }
   };
 
-  const handleRotorChange = (index: number, name: string) => {
+  const handleRotorChange = (index1: number, index: string) => {
+    const wiring = availableRotors.find((rotor) => rotor.index === index)?.wiring;
     setSelectedRotors((prev) =>
-      prev.map((rotor, i) => (i === index ? { ...rotor, name } : rotor))
+      prev.map((rotor, i) => (i === index1 ? { ...rotor, index, wiring: wiring || '' } : rotor))
     );
   };
 
@@ -134,7 +150,7 @@ const EnigmaSimulator: React.FC = () => {
         <div className="rotor-display">
           {selectedRotors.map((rotor, index) => (
             <div key={index} className="rotor-window">
-              {rotor.name}: {rotor.position}
+              {rotor.wiring}: {rotor.position}
             </div>
           ))}
         </div>

@@ -26,6 +26,13 @@
   padding: 15px;
   background-color: #34495e;
   border-radius: 8px;
+  width: 300px; /* 设置固定宽度 */
+  height: 600px; /* 设置固定高度 */
+  overflow: hidden; /* 防止内容溢出 */
+  border: 1px solid #ccc; /* 添加边框 */
+  border-radius: 8px; /* 圆角 */
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 .rotor-label {
@@ -55,3 +62,47 @@
     grid-template-columns: 1fr;
   }
 } 
+
+/* 转子卡片 */
+.rotor {
+  width: 100%; /* 让 RotorVisualizer 占满父容器宽度 */
+  height: auto; /* 自动调整高度 */
+  overflow: hidden; /* 防止内容溢出 */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.rotor svg {
+  max-width: 100%; /* 确保 SVG 不会超出容器宽度 */
+  height: auto; /* 自动调整高度 */
+}
+
+.rotor-title {
+  text-align: center;
+  margin: 0 0 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* 字母与连线 */
+.letter {
+  font-size: 12px;
+  dominant-baseline: middle;
+}
+
+.line {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.25); /* 默认浅灰 */
+  stroke-width: 1;
+}
+.line-active {
+  fill: none;
+  stroke: #ff6b00;            /* 高亮橙色 */
+  stroke-width: 2;
+}
