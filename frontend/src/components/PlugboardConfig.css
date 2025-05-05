@@ -90,3 +90,59 @@
 .add-pair-button:hover {
   background-color: #27ae60;
 } 
+
+/* 容器 */
+.wrapper {
+  position: relative;
+  max-width: 700px;
+  margin: 40px auto;
+  user-select: none;
+}
+
+/* 字母网格：13 × 2 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 8px;
+}
+
+/* 单格 */
+.box {
+  height: 42px;
+  line-height: 42px;
+  text-align: center;
+  font: 18px/42px monospace;
+  background: #f3f6ff;
+  color: #34495e;
+  border: 2px solid #4f8cff;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background .15s;
+}
+.box:active {
+  background: #c9d8ff;
+}
+
+/* 连线层 */
+.lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* 实线（已连接） */
+.solid {
+  stroke: #4f8cff;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+/* 预览线（拖拽中） */
+.preview {
+  stroke: #ff9d00;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 6 4;
+}

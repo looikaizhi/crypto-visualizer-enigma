@@ -26,55 +26,55 @@ interface RotorSelectorProps {
 const buildMappings = (wiring: string): { input: string; output: string }[] =>
   Array.from({ length: 26 }, (_, i) => ({
     input: alpha[i],
-    output: wiring[i],
+    output: wiring ? wiring[i] : alpha[i],
   }));
 
 /* ---------- Rotor 可视化 ---------- */
 interface RotorProps {
-  wiring: string;
+  rotor: RotorSelection;
   mappings: { input: string; output: string }[];
   highlightChar?: string;
 }
 
 const RotorVisualizer: React.FC<RotorProps> = ({
-  wiring,
+  rotor,
   mappings,
   highlightChar,
 }) => {
-  const rowH = 22;
+  const rowH = 30;
   const leftX = 10,
     rightX = 140,
     lineStart = 28,
     lineEnd = 122;
 
-  console.log("RotorVisualizer", wiring, mappings, highlightChar);
+  console.log("RotorVisualizer", rotor, mappings, highlightChar);
   return (
     <div className="rotor">
-      <h4 className="rotor-title">{wiring}</h4>
       <svg
         width="100%"
-        height={Math.min(rowH * 26, 600)} /* 限制最大高度 */
-        viewBox={`0 0 160 ${rowH * 26}`} /* 使用 viewBox 适配内容 */
-        preserveAspectRatio="xMidYMid meet" /* 保持比例 */
+        height="100%"
+        viewBox={`0 0 160 ${rowH * 26}`}
+        preserveAspectRatio="xMidYMid meet"
       >
         {mappings.map(({ input, output }) => {
+          const i = alpha.indexOf(input);
           const y1 = alpha.indexOf(input) * rowH + rowH / 2;
           const y2 = alpha.indexOf(output) * rowH + rowH / 2;
           const active = highlightChar === input;
           return (
             <g key={input}>
               <text className="letter" x={leftX} y={y1 + 4}>
-                {input}
+                {alpha[(i + 26 + (rotor.position.charCodeAt(0) - 65) )% 26]}         
               </text>
               <text className="letter" x={rightX} y={y2 + 4}>
                 {output}
               </text>
-              <path
+              {rotor.wiring ? (<path
                 d={`M${lineStart} ${y1} C${lineStart + 28} ${y1} ${
                   lineEnd - 28
                 } ${y2} ${lineEnd} ${y2}`}
                 className={active ? "line-active" : "line"}
-              />
+              />): (null)}
             </g>
           );
         })}
@@ -117,19 +117,15 @@ const RotorSelector: React.FC<RotorSelectorProps> = ({
             >
               {positions.map((pos) => (
                 <option key={pos} value={pos}>
-                  位置 {pos}
+                  位置{pos.charCodeAt(0) - 65 + 1} {pos} 
                 </option>
               ))}
             </select>
-            {rotor.wiring ? (
-              <RotorVisualizer
-                wiring={rotor.wiring}
-                mappings={buildMappings(rotor.wiring)}
-                highlightChar={rotor.position}
-              />
-            ) : (
-              <div className="rotor">未选择转子</div>
-            )}
+            <RotorVisualizer
+              rotor={rotor}
+              mappings={buildMappings(rotor.wiring)}
+              highlightChar={rotor.position}
+            />
           </div>
         ))}
       </div>

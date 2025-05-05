@@ -19,6 +19,7 @@ const EnigmaSimulator: React.FC = () => {
   const [plugPairs, setPlugPairs] = useState<PlugPair[]>([{ from: '', to: '' }]);
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
   const [outputText, setOutputText] = useState<string>('');
+  const [inputText, setInputText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>('');
 
@@ -58,6 +59,8 @@ const EnigmaSimulator: React.FC = () => {
   // 处理键盘输入
   const handleKeyPress = async (letter: string) => {
     try {
+      setInputText((prev) => prev + letter);
+
       const plugboardPairs = plugPairs
         .filter((pair) => pair.from && pair.to)
         .map((pair) => [pair.from, pair.to] as [string, string]);
@@ -115,6 +118,7 @@ const EnigmaSimulator: React.FC = () => {
       prev.map((rotor) => ({ ...rotor, position: 'A' }))
     );
     setOutputText('');
+    setInputText('');
     setActiveLetter(null);
     setError('');
   };
@@ -129,17 +133,19 @@ const EnigmaSimulator: React.FC = () => {
       {error && <div className="error-message">{error}</div>}
       
       <div className="config-section">
-        <RotorSelector
-          rotors={selectedRotors}
-          availableRotors={availableRotors}
-          onRotorChange={handleRotorChange}
-          onPositionChange={handlePositionChange}
-        />
-        <ReflectorSelector
-          selectedReflector={selectedReflector}
-          availableReflectors={availableReflectors}
-          onReflectorChange={handleReflectorChange}
-        />
+        <div className="rotor-reflector-container">
+          <RotorSelector
+            rotors={selectedRotors}
+            availableRotors={availableRotors}
+            onRotorChange={handleRotorChange}
+            onPositionChange={handlePositionChange}
+          />
+          <ReflectorSelector
+            selectedReflector={selectedReflector}
+            availableReflectors={availableReflectors}
+            onReflectorChange={handleReflectorChange}
+          />
+        </div>
         <PlugboardConfig
           plugPairs={plugPairs}
           onPlugPairsChange={handlePlugPairsChange}
@@ -155,8 +161,14 @@ const EnigmaSimulator: React.FC = () => {
           ))}
         </div>
         <div className="output-display">
-          <h3>输出文本</h3>
-          <div className="output-text">{outputText || '等待输入...'}</div>
+          <div className="input-section">
+            <h3>输入文本</h3>
+            <div className="input-output-text">{inputText || '等待输入...'}</div>
+          </div>
+          <div className="output-section">
+            <h3>输出文本</h3>
+            <div className="input-output-text">{outputText || '等待输入...'}</div>
+          </div>
         </div>
       </div>
 
@@ -170,4 +182,4 @@ const EnigmaSimulator: React.FC = () => {
   );
 };
 
-export default EnigmaSimulator; 
+export default EnigmaSimulator;

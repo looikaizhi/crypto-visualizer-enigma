@@ -64,15 +64,28 @@
   padding: 20px;
   border-radius: 10px;
   margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.input-section,
+.output-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .output-display h3 {
+  display: flex;
   color: #ecf0f1;
   margin: 0 0 15px 0;
   text-align: center;
 }
 
-.output-text {
+.input-output-text {
   background-color: #34495e;
   color: #f1c40f;
   padding: 15px;
@@ -117,3 +130,10 @@
     text-align: center;
   }
 } 
+
+.rotor-reflector-container {
+  display: flex;
+  gap: 20px; /* 调整间距 */
+  justify-content: space-between; /* 确保内容均匀分布 */
+  align-items: flex-start; /* 对齐顶部 */
+}
