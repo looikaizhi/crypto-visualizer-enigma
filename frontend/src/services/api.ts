@@ -2,10 +2,6 @@ import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:8000';
 
-interface InitResponse{
-  message: string;
-}
-
 export interface Rotor{
   index: string;
   wiring: string;
@@ -37,19 +33,12 @@ export interface EncryptRequest {
 export interface EncryptResponse {
   ciphertext: string;
   rotor_positions: string[];
+  plugResult: string[];
+  forwardResult: [string, string][];
+  backwardResult: [string, string][];
 }
 
 const api = {
-
-  init: async (request: EncryptRequest): Promise<InitResponse> =>{
-    const response = await axios.post(`${API_BASE_URL}/init`,{
-      ...request,
-      plugboard: request.plugboard.filter(
-        (pair) => pair[0] !== '' && pair[1] !== ''
-      ),
-    });
-    return response.data;
-  },
 
   getRotors: async () => {
     const response = await axios.get(`${API_BASE_URL}/rotors`);

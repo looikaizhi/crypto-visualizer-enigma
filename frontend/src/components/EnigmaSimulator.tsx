@@ -72,6 +72,8 @@ const EnigmaSimulator: React.FC = () => {
         plugboard: plugboardPairs,
       });
 
+      // 之后需要处理Enigma加密过程的plug转换结果，前置换过程和后置换过程
+
       setActiveLetter(response.ciphertext);
       setOutputText((prev) => prev + response.ciphertext);
       

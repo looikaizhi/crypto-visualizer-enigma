@@ -21,62 +21,27 @@ const PlugboardConfig: React.FC<PlugboardConfigProps> = ({
   const [tempPos, setTempPos] = useState<[number, number] | null>(null); // 鼠标实时位置
   const boxRefs = useRef<Map<string, HTMLDivElement>>(new Map()); // 用于存储字母格子的引用
 
-  const getAvailableLetters = (currentPair: PlugPair): string[] => {
-    const usedLetters = plugPairs
-      .filter((pair) => pair !== currentPair)
-      .flatMap((pair) => [pair.from, pair.to]);
-    return alphabet.filter((letter) => !usedLetters.includes(letter));
+  const [usedLetters, setUsedLetters] = useState<Set<string>>(new Set());
+  const addUsedLetters = (value: string) => {
+    setUsedLetters((prevSet) => new Set(prevSet).add(value));
   };
 
-  const usedLetters = new Set<string>();
-  const handlePairChange = (index: number, field: 'from' | 'to', value: string) => {
-    const newPairs = [...plugPairs];
-    newPairs[index] = { ...newPairs[index], [field]: value };
-
-    // 验证配对
-    let hasError = false;
-
-    for (const pair of newPairs) {
-      if (pair.from && pair.to) {
-        if (usedLetters.has(pair.from) || usedLetters.has(pair.to)) {
-          hasError = true;
-          break;
-        }
-        usedLetters.add(pair.from);
-        usedLetters.add(pair.to);
-      }
-    }
-
-    if (hasError) {
-      setError('每个字母只能使用一次');
-    } else {
-      setError('');
-      onPlugPairsChange(newPairs);
-    }
+  const removeUsedLetters = (value: string) => {
+    setUsedLetters((prevSet) => {
+      const newSet = new Set(prevSet);
+      newSet.delete(value);
+      return newSet;
+    });
   };
 
-  const addPair = () => {
-    if (plugPairs.length < 10) {
-      onPlugPairsChange([...plugPairs, { from: '', to: '' }]);
-    }
-  };
-
-  const removePair = (index: number) => {
-    const newPairs = plugPairs.filter((_, i) => i !== index);
-    onPlugPairsChange(newPairs);
-    usedLetters.delete(plugPairs[index].from);
-    usedLetters.delete(plugPairs[index].to);
-    setError('');
-  };
-
-  const removePair1 = (letter: string) => () => {
+  const removePair = (letter: string) => () => {
     plugPairs.forEach((pair) => {
       if (pair.from === letter || pair.to === letter) {
-        usedLetters.delete(pair.from);
-        usedLetters.delete(pair.to);
+        removeUsedLetters(pair.from);
+        removeUsedLetters(pair.to);
       }
     });
-    const newPairs = plugPairs.filter((pair) => pair.from === letter || pair.to === letter);
+    const newPairs = plugPairs.filter((pair) => pair.from !== letter && pair.to !== letter);
     onPlugPairsChange(newPairs);
     setError('');
   }
@@ -106,9 +71,13 @@ const PlugboardConfig: React.FC<PlugboardConfigProps> = ({
   // PointerUp：如果松手时在另一格子上则建立连线
   const onPointerUp = (letter: string) => (e: React.PointerEvent) => {
     e.preventDefault(); // 防止默认行为
-    if (dragStart && dragStart !== letter) {
+    if (dragStart && dragStart !== letter && 
+      !usedLetters.has(dragStart) && !usedLetters.has(letter)
+    ) {
       const newPairs = [...plugPairs, { from: dragStart, to: letter }, { from: letter, to: dragStart }];
       onPlugPairsChange(newPairs);
+      addUsedLetters(dragStart);
+      addUsedLetters(letter);
     }
     setDragStart(null);
     setTempPos(null);
@@ -195,55 +164,13 @@ const PlugboardConfig: React.FC<PlugboardConfigProps> = ({
               className="box"
               onPointerDown={onPointerDown(ch)}
               onPointerUp={onPointerUp(ch)}
-              onClick={removePair1(ch)}
+              onClick={removePair(ch)}
             >
               {ch}
             </div>
           ))}
         </div>
       </div>
-      <div className="plug-pairs">
-        {plugPairs.map((pair, index) => (
-          <div key={index} className="plug-pair">
-            <select
-              value={pair.from}
-              onChange={(e) => handlePairChange(index, 'from', e.target.value)}
-              className="plug-select"
-            >
-              <option value="">选择字母</option>
-              {getAvailableLetters(pair).map((letter) => (
-                <option key={letter} value={letter}>
-                  {letter}
-                </option>
-              ))}
-            </select>
-            <span className="connector">↔</span>
-            <select
-              value={pair.to}
-              onChange={(e) => handlePairChange(index, 'to', e.target.value)}
-              className="plug-select"
-            >
-              <option value="">选择字母</option>
-              {getAvailableLetters(pair).map((letter) => (
-                <option key={letter} value={letter}>
-                  {letter}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={() => removePair(index)}
-              className="remove-pair-button"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-      {plugPairs.length < 10 && (
-        <button onClick={addPair} className="add-pair-button">
-          添加配对
-        </button>
-      )}
     </div>
   );
 };

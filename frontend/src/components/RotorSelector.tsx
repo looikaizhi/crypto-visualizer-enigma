@@ -25,8 +25,8 @@ interface RotorSelectorProps {
 /* 将 wiring 字符串 → 26 条映射 */
 const buildMappings = (wiring: string): { input: string; output: string }[] =>
   Array.from({ length: 26 }, (_, i) => ({
-    input: alpha[i],
-    output: wiring ? wiring[i] : alpha[i],
+    input: wiring ? wiring[i] : alpha[i],
+    output: alpha[i],
   }));
 
 /* ---------- Rotor 可视化 ---------- */
@@ -46,7 +46,7 @@ const RotorVisualizer: React.FC<RotorProps> = ({
     rightX = 140,
     lineStart = 28,
     lineEnd = 122;
-
+  const wiring = rotor.wiring || alpha;
   console.log("RotorVisualizer", rotor, mappings, highlightChar);
   return (
     <div className="rotor">
@@ -57,22 +57,28 @@ const RotorVisualizer: React.FC<RotorProps> = ({
         preserveAspectRatio="xMidYMid meet"
       >
         {mappings.map(({ input, output }) => {
-          const i = alpha.indexOf(input);
+          const input1 = alpha[((rotor.position.charCodeAt(0) - 65) + alpha.indexOf(input))% 26];
+          const input2 = alpha[((alpha.indexOf(input) - (rotor.position.charCodeAt(0) - 65)%26) + 26)% 26];
+          const output1 = wiring[((rotor.position.charCodeAt(0) - 65) + alpha.indexOf(output))% 26];
+          const output2 = alpha[((alpha.indexOf(output) - (rotor.position.charCodeAt(0) - 65)%26) + 26)% 26];
           const y1 = alpha.indexOf(input) * rowH + rowH / 2;
           const y2 = alpha.indexOf(output) * rowH + rowH / 2;
+          const y3 = alpha.indexOf(input2) * rowH + rowH / 2;
+          const y4 = alpha.indexOf(output2) * rowH + rowH / 2;
           const active = highlightChar === input;
+        
           return (
             <g key={input}>
               <text className="letter" x={leftX} y={y1 + 4}>
-                {alpha[(i + 26 + (rotor.position.charCodeAt(0) - 65) )% 26]}         
+                {input1}
               </text>
               <text className="letter" x={rightX} y={y2 + 4}>
-                {output}
+                {output1}
               </text>
               {rotor.wiring ? (<path
-                d={`M${lineStart} ${y1} C${lineStart + 28} ${y1} ${
+                d={`M${lineStart} ${y3} C${lineStart + 28} ${y3} ${
                   lineEnd - 28
-                } ${y2} ${lineEnd} ${y2}`}
+                } ${y4} ${lineEnd} ${y4}`}
                 className={active ? "line-active" : "line"}
               />): (null)}
             </g>
