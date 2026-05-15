@@ -1,0 +1,24 @@
+# Rotor wiring definitions.
+ROTOR_WIRINGS = {
+    "I": "EKMFLGDQVZNTOWYHXUSPAIBRCJ",
+    "II": "AJDKSIRUXBLHWTMCQGZNPYFVOE",
+    "III": "BDFHJLCPRTXVZNYEIWGAKMUSQO",
+    "IV": "ESOVPZJAYQUIRHXLNFTGKDCMWB",
+    "V": "VZBRGITYUPSDNHLXAWMJQOFECK",
+}
+
+# Rotor notch positions.
+ROTOR_NOTCH = {
+    "I": "Q",
+    "II": "E",
+    "III": "V",
+    "IV": "J",
+    "V": "Z",
+}
+
+# Reflector wiring definitions.
+REFLECTOR_WIRINGS = {
+    "A": "EJMZALYXVBWFCRQUONTSPIKHGD",
+    "B": "YRUHQSLDPXNGOKMIEBFZCWVJAT",
+    "C": "FVPJIAOYEDRZXWGCTKUQSBNMHL",
+}
