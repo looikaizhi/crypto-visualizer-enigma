@@ -1,0 +1,71 @@
+.lamp-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 22px 18px;
+  border-radius: 10px;
+}
+
+.lamp-row {
+  display: flex;
+  gap: 12px;
+}
+
+.lamp-row:nth-child(2) {
+  padding: 0 24px;
+}
+
+.lamp {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 45%, #34302a 0%, #1a1712 80%);
+  border: 2px solid #0c0a08;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+  transition: box-shadow 400ms ease-in, background 400ms ease-in;
+}
+
+.lamp-letter {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--lamp-off);
+  transition: color 400ms ease-in, text-shadow 400ms ease-in;
+}
+
+.lamp--lit {
+  background: radial-gradient(
+    circle at 50% 45%,
+    var(--lamp-core) 0%,
+    var(--lamp-glow) 55%,
+    #a8741f 100%
+  );
+  box-shadow: var(--shadow-lamp), inset 0 0 8px rgba(255, 255, 255, 0.7);
+  transition: box-shadow 80ms ease-out, background 80ms ease-out;
+}
+
+.lamp--lit .lamp-letter {
+  color: #3a2400;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
+  transition: color 80ms ease-out;
+}
+
+@media (max-width: 600px) {
+  .lamp {
+    width: 40px;
+    height: 40px;
+  }
+  .lamp-letter {
+    font-size: 15px;
+  }
+  .lamp-row {
+    gap: 8px;
+  }
+  .lamp-row:nth-child(2) {
+    padding: 0 14px;
+  }
+}

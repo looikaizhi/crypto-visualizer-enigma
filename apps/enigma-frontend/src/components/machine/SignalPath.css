@@ -1,0 +1,172 @@
+.signal-path {
+  border-radius: 12px;
+  padding: 12px 14px 16px;
+  box-shadow: var(--shadow-raised), inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.signal-rim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 6px 12px;
+}
+
+.signal-title {
+  font-family: var(--font-plate);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.signal-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.signal-btn {
+  font-family: var(--font-plate);
+  font-weight: 600;
+  font-size: 12px;
+  min-width: 38px;
+  min-height: 34px;
+  padding: 6px 10px;
+  color: var(--ink);
+  border: 1px solid var(--brass-dark);
+  border-radius: 4px;
+  background-image: linear-gradient(180deg, var(--bakelite-raised), var(--bakelite));
+  cursor: pointer;
+  transition: filter 120ms ease, color 120ms ease;
+}
+
+.signal-btn:hover:not(:disabled) {
+  filter: brightness(1.3);
+}
+
+.signal-btn--on {
+  color: var(--case-wood-dark);
+  background-image: linear-gradient(180deg, var(--brass-light), var(--brass));
+}
+
+.signal-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.signal-step-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  min-width: 46px;
+  text-align: center;
+}
+
+.signal-empty {
+  margin: 6px;
+  font-family: var(--font-type);
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.signal-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 10px;
+  border-radius: 8px;
+  background-image: linear-gradient(180deg, #1a130b, #0d0905);
+  box-shadow: var(--shadow-recessed);
+}
+
+.signal-stage {
+  display: flex;
+  align-items: center;
+}
+
+.signal-wire {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  background: #000;
+  flex-shrink: 0;
+  transition: background 200ms ease, box-shadow 200ms ease;
+}
+
+.signal-wire--live {
+  background: var(--signal-live);
+  box-shadow: 0 0 8px var(--signal-live);
+}
+
+.signal-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  width: 58px;
+  padding: 7px 4px;
+  border-radius: 6px;
+  background-image: radial-gradient(circle at 50% 30%, #2c2418, #15110c);
+  border: 1px solid #000;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.05);
+  transition: border-color 160ms ease, box-shadow 160ms ease,
+    transform 160ms var(--ease-mech);
+}
+
+.signal-node-label {
+  font-family: var(--font-plate);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  color: var(--ink-muted);
+  text-align: center;
+  white-space: nowrap;
+  transition: color 160ms ease;
+}
+
+.signal-node-letter {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink-muted);
+  transition: color 160ms ease, text-shadow 160ms ease;
+}
+
+.signal-node--live {
+  border-color: var(--signal-live);
+  box-shadow: 0 0 10px rgba(255, 138, 61, 0.4),
+    inset 0 0 8px rgba(255, 138, 61, 0.18);
+}
+
+.signal-node--live .signal-node-letter {
+  color: var(--lamp-core);
+  text-shadow: 0 0 8px var(--signal-live);
+}
+
+.signal-node--live .signal-node-label {
+  color: var(--lamp-glow);
+}
+
+.signal-node--head {
+  transform: translateY(-3px) scale(1.06);
+  border-color: var(--lamp-glow);
+  box-shadow: 0 0 16px 3px var(--signal-live);
+}
+
+/* 端点（键盘/灯板）强调 */
+.signal-node--key.signal-node--live,
+.signal-node--lamp.signal-node--live {
+  background-image: radial-gradient(circle at 50% 30%, #4a3414, #1a130b);
+}
+
+@media (max-width: 600px) {
+  .signal-node {
+    width: 48px;
+  }
+  .signal-node-letter {
+    font-size: 17px;
+  }
+  .signal-wire {
+    width: 8px;
+  }
+}

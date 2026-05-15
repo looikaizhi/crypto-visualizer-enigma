@@ -1,9 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import KeyboardInput from './KeyboardInput';
-import LampBoard from './LampBoard';
-import RotorSelector from './RotorSelector';
-import ReflectorSelector from './ReflectorSelector';
-import PlugboardConfig from './PlugboardConfig';
+import React, { useState, useEffect, useCallback } from 'react';
+import MachinePlate from './machine/MachinePlate';
+import RotorBank from './machine/RotorBank';
+import LampBoard from './machine/LampBoard';
+import Keyboard from './machine/Keyboard';
+import Plugboard from './machine/Plugboard';
+import TapeDisplay from './machine/TapeDisplay';
+import SignalPath from './machine/SignalPath';
+import { buildTrace, TraceStage } from './machine/signal';
+import Onboarding from './onboarding/Onboarding';
+import { usePhysicalKeyboard } from '../hooks/usePhysicalKeyboard';
+import { useSound } from '../hooks/useSound';
 import api, { Rotor, PlugPair, Reflector, RotorSelection } from '../services/api';
 import './EnigmaSimulator.css';
 
@@ -65,33 +71,39 @@ const EnigmaSimulator: React.FC = () => {
   const [selectedReflector, setSelectedReflector] = useState<string>('B');
   const [plugPairs, setPlugPairs] = useState<PlugPair[]>([]);
   const [activeLetter, setActiveLetter] = useState<string | null>(null);
+  const [pressedKey, setPressedKey] = useState<string | null>(null);
   const [outputText, setOutputText] = useState<string>('');
   const [inputText, setInputText] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
+  const [trace, setTrace] = useState<TraceStage[] | null>(null);
+  const [traceVersion, setTraceVersion] = useState<number>(0);
+  const [announcement, setAnnouncement] = useState<string>('');
+  const sound = useSound();
+  const [showOnboarding, setShowOnboarding] = useState<boolean>(
+    () => !localStorage.getItem('enigma-onboarded')
+  );
+
+  const dismissOnboarding = () => {
+    localStorage.setItem('enigma-onboarded', '1');
+    setShowOnboarding(false);
+  };
 
   useEffect(() => {
     const initializeEnigma = async () => {
       try {
-        // 获取可用的转子和反射器
         const [rotors, reflectors] = await Promise.all([
           api.getRotors(),
           api.getReflectors(),
         ]);
-        console.log(rotors, reflectors);
-        // 转换 rotors 数据为数组
         const rotorArray = Object.entries(rotors).map(([index, wiring]) => ({
           index,
           wiring: wiring as string,
         }));
-
-        // 转换 reflectors 数据为数组
-        const reflectorArray = Object.entries(reflectors).map(([index, wiring]) => ({
-          index,
-          wiring: wiring as string,
-        }));
-
+        const reflectorArray = Object.entries(reflectors).map(
+          ([index, wiring]) => ({ index, wiring: wiring as string })
+        );
         setAvailableRotors(rotorArray);
         setAvailableReflectors(reflectorArray);
         setIsLoading(false);
@@ -100,147 +112,184 @@ const EnigmaSimulator: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     initializeEnigma();
   }, []);
 
-  // 处理键盘输入
-  const handleKeyPress = async (letter: string) => {
-    if (isEncrypting) return;
+  const handleKeyPress = useCallback(
+    async (letter: string) => {
+      if (isEncrypting) return;
 
-    const result = validateConfig(selectedRotors, selectedReflector, plugPairs);
-    if (!result.ok) {
-      setError(result.message);
-      return;
-    }
+      const result = validateConfig(selectedRotors, selectedReflector, plugPairs);
+      if (!result.ok) {
+        setError(result.message);
+        return;
+      }
 
-    const plugboardPairs = plugPairs
-      .filter((pair) => pair.from && pair.to)
-      .map((pair) => [pair.from, pair.to] as [string, string]);
+      setPressedKey(letter);
+      sound.playKey();
+      setTimeout(() => setPressedKey((cur) => (cur === letter ? null : cur)), 160);
 
-    setIsEncrypting(true);
-    try {
-      const response = await api.encrypt({
-        plaintext: letter,
-        rotors: selectedRotors,
-        reflector: selectedReflector,
-        plugboard: plugboardPairs,
-      });
+      const plugboardPairs = plugPairs
+        .filter((pair) => pair.from && pair.to)
+        .map((pair) => [pair.from, pair.to] as [string, string]);
 
-      setInputText((prev) => prev + letter);
-      setOutputText((prev) => prev + response.ciphertext);
-      setSelectedRotors((prev) =>
-        prev.map((rotor, index) => ({
-          ...rotor,
-          position: response.rotor_positions[index],
-        }))
-      );
-      setActiveLetter(response.ciphertext);
-      setError('');
-      setTimeout(() => {
-        setActiveLetter(null);
-      }, 500);
-    } catch (err) {
-      setError(extractApiError(err));
-    } finally {
-      setIsEncrypting(false);
-    }
-  };
+      setIsEncrypting(true);
+      try {
+        const response = await api.encrypt({
+          plaintext: letter,
+          rotors: selectedRotors,
+          reflector: selectedReflector,
+          plugboard: plugboardPairs,
+        });
 
-  const handleRotorChange = (index1: number, index: string) => {
-    const wiring = availableRotors.find((rotor) => rotor.index === index)?.wiring;
+        setInputText((prev) => prev + letter);
+        setOutputText((prev) => prev + response.ciphertext);
+        setSelectedRotors((prev) =>
+          prev.map((rotor, index) => ({
+            ...rotor,
+            position: response.rotor_positions[index],
+          }))
+        );
+        setActiveLetter(response.ciphertext);
+        sound.playLamp();
+        setAnnouncement(`字母 ${letter} 加密为 ${response.ciphertext}`);
+        setTrace(
+          buildTrace(letter, response, [
+            selectedRotors[0].index,
+            selectedRotors[1].index,
+            selectedRotors[2].index,
+          ])
+        );
+        setTraceVersion((v) => v + 1);
+        setError('');
+        setTimeout(() => setActiveLetter(null), 500);
+      } catch (err) {
+        setError(extractApiError(err));
+      } finally {
+        setIsEncrypting(false);
+      }
+    },
+    [isEncrypting, selectedRotors, selectedReflector, plugPairs, sound]
+  );
+
+  usePhysicalKeyboard(handleKeyPress, !isLoading && !isEncrypting);
+
+  const handleRotorChange = (slot: number, index: string) => {
+    const wiring = availableRotors.find((r) => r.index === index)?.wiring;
     setSelectedRotors((prev) =>
-      prev.map((rotor, i) => (i === index1 ? { ...rotor, index, wiring: wiring || '' } : rotor))
+      prev.map((rotor, i) =>
+        i === slot ? { ...rotor, index, wiring: wiring || '' } : rotor
+      )
     );
   };
 
-  const handlePositionChange = (index: number, position: string) => {
+  const handlePositionChange = (slot: number, position: string) => {
     setSelectedRotors((prev) =>
-      prev.map((rotor, i) => (i === index ? { ...rotor, position } : rotor))
+      prev.map((rotor, i) => (i === slot ? { ...rotor, position } : rotor))
     );
   };
 
-  const handleRingSettingChange = (index: number, ringSetting: string) => {
+  const handleRingSettingChange = (slot: number, ringSetting: string) => {
     setSelectedRotors((prev) =>
-      prev.map((rotor, i) => (i === index ? { ...rotor, ringSetting } : rotor))
+      prev.map((rotor, i) => (i === slot ? { ...rotor, ringSetting } : rotor))
     );
-  };
-
-  const handleReflectorChange = (reflector: string) => {
-    setSelectedReflector(reflector);
-  };
-
-  const handlePlugPairsChange = (pairs: PlugPair[]) => {
-    setPlugPairs(pairs);
   };
 
   const handleReset = () => {
-    setSelectedRotors((prev) =>
-      prev.map((rotor) => ({ ...rotor, position: 'A' }))
-    );
+    setSelectedRotors((prev) => prev.map((rotor) => ({ ...rotor, position: 'A' })));
     setOutputText('');
     setInputText('');
     setActiveLetter(null);
+    setPressedKey(null);
+    setTrace(null);
     setError('');
     setIsEncrypting(false);
   };
 
+  const handlePreset = () => {
+    const pick = (idx: string) =>
+      availableRotors.find((r) => r.index === idx)?.wiring || '';
+    setSelectedRotors([
+      { index: 'I', wiring: pick('I'), position: 'A', ringSetting: 'A' },
+      { index: 'II', wiring: pick('II'), position: 'A', ringSetting: 'A' },
+      { index: 'III', wiring: pick('III'), position: 'A', ringSetting: 'A' },
+    ]);
+    setSelectedReflector('B');
+    setPlugPairs([
+      { from: 'A', to: 'M' },
+      { from: 'F', to: 'I' },
+      { from: 'N', to: 'V' },
+    ]);
+    setOutputText('');
+    setInputText('');
+    setActiveLetter(null);
+    setTrace(null);
+    setError('');
+  };
+
   if (isLoading) {
-    return <div className="loading">加载中...</div>;
+    return (
+      <div className="enigma-loading">
+        <div className="enigma-loading-disc" />
+        <span>正在装配密码机…</span>
+      </div>
+    );
   }
 
   return (
-    <div className="enigma-simulator">
-      <h1>Enigma 密码机模拟器</h1>
-      {error && <div className="error-message">{error}</div>}
-      
-      <div className="config-section">
-        <div className="rotor-reflector-container">
-          <RotorSelector
-            rotors={selectedRotors}
-            availableRotors={availableRotors}
-            onRotorChange={handleRotorChange}
-            onPositionChange={handlePositionChange}
-            onRingSettingChange={handleRingSettingChange}
-          />
-          <ReflectorSelector
-            selectedReflector={selectedReflector}
-            availableReflectors={availableReflectors}
-            onReflectorChange={handleReflectorChange}
-          />
-        </div>
-        <PlugboardConfig
-          plugPairs={plugPairs}
-          onPlugPairsChange={handlePlugPairsChange}
+    <div className="enigma-machine">
+      {showOnboarding && (
+        <Onboarding
+          onClose={dismissOnboarding}
+          onLoadPreset={() => {
+            handlePreset();
+            dismissOnboarding();
+          }}
         />
+      )}
+
+      <MachinePlate
+        onReset={handleReset}
+        onPreset={handlePreset}
+        onHelp={() => setShowOnboarding(true)}
+        soundOn={sound.enabled}
+        onToggleSound={sound.toggle}
+      />
+
+      <div className="sr-only" aria-live="polite">
+        {announcement}
       </div>
 
-      <div className="display-section">
-        <div className="rotor-display">
-          {selectedRotors.map((rotor, index) => (
-            <div key={index} className="rotor-window">
-              {rotor.index || '—'}: {rotor.position}
-            </div>
-          ))}
+      {error && (
+        <div className="machine-fault" role="alert">
+          <span className="fault-lamp" aria-hidden="true" />
+          {error}
         </div>
-        <div className="output-display">
-          <div className="input-section">
-            <h3>输入文本</h3>
-            <div className="input-output-text">{inputText || '等待输入...'}</div>
-          </div>
-          <div className="output-section">
-            <h3>输出文本</h3>
-            <div className="input-output-text">{outputText || '等待输入...'}</div>
-          </div>
-        </div>
-      </div>
+      )}
+
+      <RotorBank
+        rotors={selectedRotors}
+        availableRotors={availableRotors}
+        selectedReflector={selectedReflector}
+        availableReflectors={availableReflectors}
+        onRotorChange={handleRotorChange}
+        onPositionChange={handlePositionChange}
+        onRingSettingChange={handleRingSettingChange}
+        onReflectorChange={setSelectedReflector}
+      />
 
       <LampBoard activeLetter={activeLetter} />
-      <KeyboardInput onKeyPress={handleKeyPress} disabled={isEncrypting} />
+      <Keyboard
+        onKeyPress={handleKeyPress}
+        disabled={isEncrypting}
+        pressedKey={pressedKey}
+      />
 
-      <button onClick={handleReset} className="reset-button">
-        重置
-      </button>
+      <SignalPath trace={trace} version={traceVersion} />
+
+      <Plugboard plugPairs={plugPairs} onPlugPairsChange={setPlugPairs} />
+
+      <TapeDisplay inputText={inputText} outputText={outputText} />
     </div>
   );
 };

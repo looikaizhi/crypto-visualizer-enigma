@@ -1,0 +1,55 @@
+:root {
+  /* 外壳 / 木质 */
+  --case-wood-dark: #2a1a0e;
+  --case-wood: #4a2f1a;
+  --case-wood-light: #6b4626;
+
+  /* 金属 / 黄铜 */
+  --brass: #b8893a;
+  --brass-light: #e8c77a;
+  --brass-dark: #7a5520;
+  --steel: #3c3f44;
+
+  /* 胶木面板 */
+  --bakelite: #15110d;
+  --bakelite-raised: #221c15;
+
+  /* 灯 / 辉光 */
+  --lamp-off: #2b2620;
+  --lamp-glow: #ffd56b;
+  --lamp-core: #fff4d6;
+  --signal-live: #ff8a3d;
+
+  /* 文字 */
+  --ink: #ede3ce;
+  --ink-muted: #9a8b6e;
+  --engrave-shadow: #00000099;
+
+  /* 语义 */
+  --danger: #b3422e;
+  --success: #6e8c3a;
+
+  /* 阴影层级 */
+  --shadow-recessed: inset 0 2px 6px #000000aa;
+  --shadow-raised: 0 2px 0 #00000066, 0 6px 14px #0008;
+  --shadow-lamp: 0 0 18px 4px var(--lamp-glow);
+
+  /* 动效 */
+  --ease-mech: cubic-bezier(0.34, 1.2, 0.64, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* 字体 */
+  --font-plate: 'Oswald', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  --font-type: 'Special Elite', 'Courier New', monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

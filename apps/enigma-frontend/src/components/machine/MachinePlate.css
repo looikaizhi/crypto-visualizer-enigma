@@ -1,0 +1,100 @@
+.machine-plate {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 28px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.plate-shine {
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: skewX(-18deg);
+  animation: plate-sweep 5s ease-in-out 0.6s infinite;
+  pointer-events: none;
+}
+
+@keyframes plate-sweep {
+  0%,
+  60%,
+  100% {
+    left: -60%;
+  }
+  78% {
+    left: 130%;
+  }
+}
+
+.plate-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.plate-title {
+  margin: 0;
+  font-family: var(--font-plate);
+  font-weight: 700;
+  font-size: 30px;
+  letter-spacing: 0.42em;
+  text-indent: 0.42em;
+}
+
+.plate-sub {
+  font-family: var(--font-plate);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  opacity: 0.85;
+}
+
+.plate-knobs {
+  display: flex;
+  gap: 12px;
+}
+
+.knob-btn {
+  font-family: var(--font-plate);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  padding: 9px 16px;
+  min-height: 44px;
+  border-radius: 22px;
+  border: 1px solid var(--brass-dark);
+  background-image: linear-gradient(180deg, var(--bakelite-raised), var(--bakelite));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-raised);
+  cursor: pointer;
+  transition: transform 120ms var(--ease-mech), filter 120ms ease;
+}
+
+.knob-btn:hover {
+  filter: brightness(1.25);
+}
+
+.knob-btn:active {
+  transform: translateY(2px);
+}
+
+@media (max-width: 600px) {
+  .machine-plate {
+    flex-direction: column;
+    text-align: center;
+    padding: 14px 16px;
+  }
+  .plate-title {
+    font-size: 24px;
+  }
+}

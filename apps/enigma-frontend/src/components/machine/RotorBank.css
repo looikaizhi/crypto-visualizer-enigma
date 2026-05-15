@@ -1,0 +1,57 @@
+.rotor-bank {
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: var(--shadow-raised), inset 0 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.rotor-bank-rim {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 10px 12px;
+}
+
+.rotor-bank-title {
+  font-family: var(--font-plate);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
+
+.lid-btn {
+  font-family: var(--font-plate);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  color: var(--case-wood-dark);
+  padding: 8px 14px;
+  min-height: 40px;
+  border-radius: 5px;
+  border: 1px solid var(--brass-dark);
+  background-image: linear-gradient(180deg, var(--brass-light), var(--brass));
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+
+.lid-btn:hover {
+  filter: brightness(1.1);
+}
+
+.rotor-bank-tray {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 16px 10px;
+  border-radius: 8px;
+  background-image: linear-gradient(180deg, #1a130b, #0d0905);
+  box-shadow: var(--shadow-recessed);
+}
+
+@media (max-width: 600px) {
+  .rotor-bank-tray {
+    gap: 10px;
+  }
+}
