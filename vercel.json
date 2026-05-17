@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm --prefix apps/enigma-frontend install",
+  "buildCommand": "npm --prefix apps/enigma-frontend run build",
+  "outputDirectory": "apps/enigma-frontend/build",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" }
+  ]
+}

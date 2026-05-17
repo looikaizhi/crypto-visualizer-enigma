@@ -16,4 +16,5 @@ __pycache__/
 .venv/
 
 .playwright/
+.playwright-cli/
 .claude/

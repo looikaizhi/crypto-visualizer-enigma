@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL ?? '';
 
 export interface Rotor {
   index: string;
@@ -46,12 +46,12 @@ export interface EncryptResponse {
 
 const api = {
   getRotors: async () => {
-    const response = await axios.get(`${API_BASE_URL}/rotors`);
+    const response = await axios.get(`${API_BASE_URL}/api/rotors`);
     return response.data;
   },
 
   getReflectors: async () => {
-    const response = await axios.get(`${API_BASE_URL}/reflectors`);
+    const response = await axios.get(`${API_BASE_URL}/api/reflectors`);
     return response.data;
   },
 
@@ -68,7 +68,7 @@ const api = {
         ring_setting: r.ringSetting,
       })),
     };
-    const response = await axios.post(`${API_BASE_URL}/encrypt`, payload);
+    const response = await axios.post(`${API_BASE_URL}/api/encrypt`, payload);
     return response.data;
   },
 };

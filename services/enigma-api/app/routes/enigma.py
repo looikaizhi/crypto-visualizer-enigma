@@ -4,7 +4,7 @@ from app.core.constants import REFLECTOR_WIRINGS, ROTOR_NOTCH, ROTOR_WIRINGS
 from app.core.machine import EnigmaMachine, Plugboard, Reflector, Rotor
 from app.models.schemas import EncryptRequest, EncryptResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 
 @router.get("/rotors")
