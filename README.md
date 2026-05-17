@@ -137,7 +137,8 @@ crypto-visualizer-enigma/
 ├─ 🧪 prototypes/
 │   └─ plugboard-drag-demo/    Drag-to-wire plugboard sandbox
 │
-├─ 📚 docs/                    Architecture · API · Development · Layout
+├─ 📚 docs/                    Architecture · API · Development · Layout (English)
+├─ 🀄 docs_cn/                 Chinese translations
 └─ 📜 specs/                   Business-logic tests & change plans
 ```
 
@@ -151,6 +152,9 @@ crypto-visualizer-enigma/
 | 🔌 Look up API fields and examples | [docs/api.md](docs/api.md) |
 | 🛠️ Set up the dev environment locally | [docs/development.md](docs/development.md) |
 | 🗂️ See how the directories are organised | [docs/directory-layout.md](docs/directory-layout.md) |
+| 🎨 Frontend module guide | [docs/enigma-frontend.md](docs/enigma-frontend.md) |
+| ⚙️ Backend service guide | [docs/enigma-api.md](docs/enigma-api.md) |
+| 🧪 Plugboard drag prototype | [docs/plugboard-drag-demo.md](docs/plugboard-drag-demo.md) |
 
 🌏 **Prefer Chinese?** Full documentation is available in [`docs_cn/`](docs_cn/README.md).
 

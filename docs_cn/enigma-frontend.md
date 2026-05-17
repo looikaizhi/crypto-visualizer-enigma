@@ -1,6 +1,6 @@
 <div align="right">
 
-[English](../apps/enigma-frontend/README.md) · 🌐 **中文**
+[English](../docs/enigma-frontend.md) · 🌐 **中文**
 
 </div>
 
@@ -20,6 +20,18 @@
 
 ---
 
+## 📸 界面预览
+
+<p align="center">
+  <img src="../pics/enigma-frontend-overview.png" alt="Enigma 前端整体界面" width="420" />
+</p>
+
+<p align="center">
+  <em>整体界面：转子区、灯板、键盘、信号路径面板、插线板、输入/输出条。</em>
+</p>
+
+---
+
 ## ✨ 这是什么？
 
 Enigma Visualizer 的 **主前端**：用 React + TypeScript 构建的交互式 UI，让你可以——
@@ -28,6 +40,26 @@ Enigma Visualizer 的 **主前端**：用 React + TypeScript 构建的交互式 
 - 🔌 在插线板上**拖拽连线**
 - ⌨️ 按下屏幕键盘，看灯板逐字符亮起
 - 🔍 跟踪每一束电流在 Enigma 内部的完整路径
+
+---
+
+## 🎛️ 各部件长这样
+
+### 转子区
+
+![转子与反射器](../pics/rotors.png)
+
+最左是反射器（UKW B），右侧是三个转子。每个转子可下拉切换型号、滚动可见字母，也可以用 ▲ / ▼ 按钮单步推进。
+
+### 插线板
+
+![插线板（空）](../pics/plugboard.png)
+
+点击两个字母即可连成一对；再点已连线字母即拔掉电缆。
+
+![插线板（已连线）](../pics/plugboard-wired.png)
+
+连线后的插线板：两对已建立（`A ↔ M`、`C ↔ Z`）。右上角计数器按历史规则限制最多 10 对。
 
 ---
 

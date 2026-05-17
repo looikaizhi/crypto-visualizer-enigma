@@ -1,6 +1,6 @@
 <div align="right">
 
-[English](../prototypes/plugboard-drag-demo/README.md) · 🌐 **中文**
+[English](../docs/plugboard-drag-demo.md) · 🌐 **中文**
 
 </div>
 
@@ -20,11 +20,23 @@ Enigma **插线板（Plugboard）拖拽连线**的最小可运行原型。
 
 > 不连接后端、不跑加密 —— 只验证一件事：**鼠标拖动产生的"插线"交互够不够顺手。**
 
-```
-   A   B   C   D   E   F   G   ...   Z
-   ●───────────────●     ●─────●
-   拖    拽    生    成    的    连    线
-```
+<p align="center">
+  <img src="../pics/plugboard.png" alt="空白的插线板" width="520" />
+</p>
+
+<p align="center">
+  <em>未接线的板子：26 个插孔按 QWERTZ 排布，等着第一根电缆。</em>
+</p>
+
+<p align="center">
+  <img src="../pics/plugboard-wired.png" alt="接了两根电缆的插线板" width="520" />
+</p>
+
+<p align="center">
+  <em>连了两对之后（<code>A ↔ M</code>、<code>C ↔ Z</code>）—— 每根电缆有自己的颜色，便于交叉时分辨。</em>
+</p>
+
+> 💡 上面的截图取自正式版前端的插线板，使用与本原型相同的交互模型。
 
 ---
 

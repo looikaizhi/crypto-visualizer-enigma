@@ -1,6 +1,6 @@
 <div align="right">
 
-[English](../services/enigma-api/README.md) · 🌐 **中文**
+[English](../docs/enigma-api.md) · 🌐 **中文**
 
 </div>
 
