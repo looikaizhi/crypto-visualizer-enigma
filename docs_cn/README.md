@@ -13,15 +13,19 @@
 **一台跑得起来、看得见、摸得着的 Enigma —— 用代码复刻一段改变历史的密码学传奇**
 
 <p>
-  <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&style=flat-square" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white&style=flat-square" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-4.9-3178C6?logo=typescript&logoColor=white&style=flat-square" />
   <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white&style=flat-square" />
   <img alt="Python" src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white&style=flat-square" />
   <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square" />
 </p>
 
-[🚀 快速启动](#-30-秒上手) · [🧩 项目结构](#-项目全貌) · [📚 文档](#-文档导航) · [🤝 参与贡献](#-参与贡献)
+<img src="../pics/qa-layout.png" alt="Enigma Visualizer · 单视口 Bento 布局" width="780" />
+
+<sub><em>一个窗口、不滚动、所有插线 / 转子 / 电流路径同框登场。</em></sub>
+
+[🚀 快速启动](#-30-秒上手) · [📸 画廊](#-它长这样) · [🧩 项目结构](#-项目全貌) · [📚 文档](#-文档导航) · [🤝 参与贡献](#-参与贡献)
 
 </div>
 
@@ -37,37 +41,68 @@
 
 | | |
 |---|---|
-| 🎛️ **真实物理模型** | 转子步进、双步异常、反射器对称、插线板交换 —— 历史细节，逐一还原 |
-| 👁️ **过程全可视** | 每一次按键，电流如何穿过 8 层映射，**一目了然** |
-| 🧪 **前后端分离** | React + TypeScript 前端 · FastAPI + Pydantic 后端，干净的现代架构 |
-| 🧩 **拖拽式交互** | 插线板像真机一样**鼠标拖线**连接 A↔Z，谁还看代码改配置 |
+| 🖼️ **单视口 Bento 布局** | 整台机器装进一屏 —— **不滚动、不找角**。黄铜配胡桃木，每个区域各就其位 |
+| 🔍 **内部就是界面** | 五列触点（`插线板 · R3 · R2 · R1 · 反射器`）一次画满 26 × 5 根线，你看到的不只是"结果"，而是 Enigma 的**几何结构本身** |
+| ⚡ **看着电子穿过机器** | 按下一键，去程沿黄铜色顺势深入；反射器一弹后，回程换成冷铜青色返回 —— 箭头明确，去回不混淆 |
+| 🎛️ **真实物理模型** | 转子步进、双步异常、反射器对称、插线板交换 —— 历史细节逐一还原 |
+| 🔌 **插线板变身长条** | 26 个插孔横向单行排列，跳线在上方画弧。点两下连线、点一下拔线 |
+| 🧪 **干净的现代栈** | React 18 + TypeScript 前端 · FastAPI + Pydantic / Python 3.13 后端 |
+| ♿ **为"被研究"而设计** | 鼠标悬停任意触点立刻显示中文映射 · Tab 全键盘可达 · 尊重 `prefers-reduced-motion` |
+| 🌐 **中英双语界面** | 顶栏一键切换 **English** / **中文** —— 标签、提示、新手引导手册全部跟着变 |
 | 📖 **代码即教材** | 想懂 Enigma？想学 FastAPI？想练 React？三合一开源教程 |
 
 ---
 
 ## 🎬 它长这样
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                  🔐  Enigma Visualizer                        │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│   [ I  ]   [ II ]   [ III ]    ←  转子（可拖动旋转）          │
-│     A         A         A                                    │
-│                                                              │
-│            ╔═══ Reflector B ═══╗                             │
-│                                                              │
-│     ┌─── Plugboard ───┐                                      │
-│     │ A━━M  C━━Z  ... │      ← 拖拽连线，所见即所得           │
-│     └─────────────────┘                                      │
-│                                                              │
-│   [Q W E R T Y U I O P]      ← 屏幕键盘                       │
-│   ●·●·●·●·●·●·●·●·●·●        ← 灯板亮起密文字母              │
-│                                                              │
-│   in : HELLO                                                 │
-│   out: MFNCZ                                                 │
-└──────────────────────────────────────────────────────────────┘
-```
+> 把 1918 年的密码机，**用黄铜与胡桃木重画到 2025 年的浏览器里。** 五列触点同时摊开整条信号链，你不用再猜机器内部到底在发生什么。
+
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="../pics/qa-core-idle.png" alt="机器内部 · 待机" width="100%" />
+  <br /><sub><b>🪵 待机状态</b> —— 五列横截面：<code>插线板 · R3 · R2 · R1 · 反射器</code>。所有静态接线都以淡色一并呈现，Enigma 的几何结构始终可见。</sub>
+</td>
+<td width="50%" align="center">
+  <img src="../pics/qa-core-flow-full.png" alt="电流穿过五列" width="100%" />
+  <br /><sub><b>⚡ 一键十段</b> —— 去程黄铜色、回程冷铜青色，亲眼看电子从键盘一路深入，再经反射器折返灯板。</sub>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+  <img src="../pics/qa-plug.png" alt="插线板长条" width="100%" />
+  <br /><sub><b>🔌 插线板长条</b> —— 26 插孔单行排列，跳线在上方画弧。点两个字母即连线，每根电缆自动配色，交叉处不再混淆。</sub>
+</td>
+<td width="50%" align="center">
+  <img src="../pics/qa-side.png" alt="灯板 / 键盘 / 文本带" width="100%" />
+  <br /><sub><b>💡 键盘 ↔ 灯板</b> —— 输入文本带贴在键盘下方、输出文本带贴在灯板下方，永远不会跑到页脚去找。</sub>
+</td>
+</tr>
+</table>
+
+<details>
+<summary><b>🔎 更多细节：触点悬停 · 单步调试 · 重播时间轴</b></summary>
+
+<br />
+
+<table>
+<tr>
+<td width="33%" align="center">
+  <img src="../pics/qa-hover.png" alt="触点悬停提示" width="100%" />
+  <br /><sub>鼠标悬停任意触点，立刻显示当前映射：<code>R2 外环 X → 内触点 V</code>。</sub>
+</td>
+<td width="33%" align="center">
+  <img src="../pics/qa-core-step.png" alt="单步动画" width="100%" />
+  <br /><sub>单步模式逐段揭示电流路径，停在任何一步都能慢慢拆解。</sub>
+</td>
+<td width="33%" align="center">
+  <img src="../pics/qa-replay-step.png" alt="重播时间轴" width="100%" />
+  <br /><sub>底部 11 个圆点 = 完整信号链。可任意拖动、重播、放慢。</sub>
+</td>
+</tr>
+</table>
+
+</details>
 
 ---
 
@@ -112,6 +147,8 @@ npm start
 ```
 
 ✅ 浏览器打开 `http://localhost:3000`，开始你的密码之旅。
+
+> 💡 首次启动会弹出三步**操作手册**，带你装载转子、敲击按键、观察电流。随时可跳过 —— 也能从顶栏的**手册**按钮重新打开。
 
 ### 3️⃣ （可选）单独玩插线板拖拽原型
 

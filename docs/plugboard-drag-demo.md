@@ -21,22 +21,14 @@ The smallest runnable prototype of Enigma's **plugboard drag-to-wire** interacti
 > No backend, no encryption — just answering one question: **does dragging a cable feel right?**
 
 <p align="center">
-  <img src="../pics/plugboard.png" alt="Empty plugboard" width="520" />
+  <img src="../pics/qa-plug-en.png" alt="The plugboard strip with four cables" width="780" />
 </p>
 
 <p align="center">
-  <em>The blank board: 26 sockets laid out QWERTZ-style, waiting for a cable.</em>
+  <em>The plugboard as it ships today in the main app: 26 sockets in a single row, cables arcing as half-circles above. Four pairs wired here (<code>F ↔ N</code>, <code>G ↔ H</code>, <code>I ↔ M</code>, <code>L ↔ V</code>) — each gets its own colour so crossings stay legible. The counter on the right tracks the historical 10-pair limit.</em>
 </p>
 
-<p align="center">
-  <img src="../pics/plugboard-wired.png" alt="Plugboard with two cables" width="520" />
-</p>
-
-<p align="center">
-  <em>After two pairs are wired (<code>A ↔ M</code>, <code>C ↔ Z</code>) — each cable gets its own colour so overlaps stay readable.</em>
-</p>
-
-> 💡 The screenshots above are captured from the full app's plugboard, which uses the same interaction model this prototype was built to validate.
+> 💡 The screenshot above is the production plugboard inside [`apps/enigma-frontend`](../apps/enigma-frontend/). This standalone prototype was the sandbox where its **drag-to-connect** mechanics were tuned before being folded into the real machine.
 
 ---
 

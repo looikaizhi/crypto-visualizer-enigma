@@ -13,15 +13,19 @@
 **A runnable, watchable, touchable Enigma — a piece of cryptographic history, brought back to life in code.**
 
 <p>
-  <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&style=flat-square" />
-  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white&style=flat-square" />
+  <img alt="React" src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=flat-square" />
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-4.9-3178C6?logo=typescript&logoColor=white&style=flat-square" />
   <img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white&style=flat-square" />
   <img alt="Python" src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white&style=flat-square" />
   <img alt="License" src="https://img.shields.io/badge/License-MIT-green?style=flat-square" />
   <img alt="PRs Welcome" src="https://img.shields.io/badge/PRs-welcome-ff69b4?style=flat-square" />
 </p>
 
-[🚀 Quick Start](#-30-second-setup) · [🧩 Project Layout](#-project-at-a-glance) · [📚 Docs](#-documentation) · [🤝 Contributing](#-contributing)
+<img src="pics/qa-layout-en.png" alt="Enigma Visualizer — single-viewport bento layout" width="780" />
+
+<sub><em>One window. No scrolling. Every plug, every rotor, every electrical path — all on stage at once.</em></sub>
+
+[🚀 Quick Start](#-30-second-setup) · [📸 Gallery](#-what-it-looks-like) · [🧩 Project Layout](#-project-at-a-glance) · [📚 Docs](#-documentation) · [🤝 Contributing](#-contributing)
 
 </div>
 
@@ -37,37 +41,68 @@
 
 | | |
 |---|---|
-| 🎛️ **Faithful physical model** | Rotor stepping, the double-step anomaly, reflector symmetry, plugboard swaps — all the historical quirks |
-| 👁️ **Fully visualised flow** | Watch the current travel through 8 layers of mapping on every keystroke |
-| 🧪 **Clean modern stack** | React + TypeScript on the front · FastAPI + Pydantic on the back |
-| 🧩 **Drag-to-wire plugboard** | Connect A ↔ Z by **dragging cables**, just like the real machine |
+| 🖼️ **Single-viewport bento layout** | The whole machine lives on one screen — **no scrolling**, no hunting. Brass-on-walnut visual identity, every region in its place |
+| 🔍 **The internals are the UI** | Five contact columns (`Plugboard · R3 · R2 · R1 · Reflector`) draw all 26 × 5 wires at once — you don't just *see the result*, you see **the geometry** |
+| ⚡ **Watch the electron travel** | Press a key and a brass current snakes forward through the rotors, bounces off the reflector, and copper-cools its way home — with arrowheads so the direction is never ambiguous |
+| 🎛️ **Faithful physical model** | Rotor stepping, the double-step anomaly, reflector symmetry, plugboard swaps — every historical quirk preserved |
+| 🔌 **Plugboard reborn as a strip** | One clean row of 26 sockets, cables arcing above. Click-to-wire, click-to-pull |
+| 🧪 **Clean modern stack** | React 18 + TypeScript on the front · FastAPI + Pydantic 3.13 on the back |
+| ♿ **Built to be inspected** | Hover any contact for a plain-English mapping · Tab-navigable · respects `prefers-reduced-motion` |
+| 🌐 **Bilingual UI** | Flip the whole interface between **English** and **中文** with one click in the topbar — labels, tooltips and the onboarding manual all follow |
 | 📖 **Code as a textbook** | Curious about cryptography? FastAPI? React? Three tutorials in one repo |
 
 ---
 
 ## 🎬 What it looks like
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                  🔐  Enigma Visualizer                        │
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│   [ I  ]   [ II ]   [ III ]    ←  rotors (drag to rotate)    │
-│     A         A         A                                    │
-│                                                              │
-│            ╔═══ Reflector B ═══╗                             │
-│                                                              │
-│     ┌─── Plugboard ───┐                                      │
-│     │ A━━M  C━━Z  ... │      ← drag cables · WYSIWYG          │
-│     └─────────────────┘                                      │
-│                                                              │
-│   [Q W E R T Y U I O P]      ← on-screen keyboard            │
-│   ●·●·●·●·●·●·●·●·●·●        ← lampboard lights ciphertext   │
-│                                                              │
-│   in : HELLO                                                 │
-│   out: MFNCZ                                                 │
-└──────────────────────────────────────────────────────────────┘
-```
+> A 1918 cipher machine, **redrawn in brass and walnut for a 2025 browser.** Five stacked contact columns reveal the entire signal chain at once — no more guessing what's happening inside the box.
+
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="pics/qa-core-idle-en.png" alt="Machine core at rest" width="100%" />
+  <br /><sub><b>🪵 At rest</b> — the five-column cross-section: <code>Plugboard · R3 · R2 · R1 · Reflector</code>. Every static wire is drawn faintly so the geometry of Enigma is always visible.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="pics/qa-core-flow-full-en.png" alt="Current flowing through all five columns" width="100%" />
+  <br /><sub><b>⚡ One key, ten hops</b> — brass for the forward path, cool copper for the return. Watch the electron retrace its way home through the reflector.</sub>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+  <img src="pics/qa-plug-en.png" alt="Plugboard cable strip" width="100%" />
+  <br /><sub><b>🔌 The plugboard strip</b> — a single row of 26 sockets, cables arcing above. Click two letters; the cable picks its own colour so crossings stay readable.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="pics/qa-side-en.png" alt="Lampboard, keyboard and tape" width="100%" />
+  <br /><sub><b>💡 Keyboard ↔ Lampboard</b> — input tape glued to the keys, output tape glued to the lamps. The text never wanders off to a footer.</sub>
+</td>
+</tr>
+</table>
+
+<details>
+<summary><b>🔎 More: hover tooltips · step-through replay · single-step debugger</b></summary>
+
+<br />
+
+<table>
+<tr>
+<td width="33%" align="center">
+  <img src="pics/qa-hover-en.png" alt="Contact hover tooltip" width="100%" />
+  <br /><sub>Hover any of the 26 × 5 contacts to read its mapping in plain English: <code>R2 outer ring X → inner contact V</code>.</sub>
+</td>
+<td width="33%" align="center">
+  <img src="pics/qa-core-step-en.png" alt="Single-step animation" width="100%" />
+  <br /><sub>Single-step mode walks the trace one hop at a time — pause anywhere and inspect the geometry.</sub>
+</td>
+<td width="33%" align="center">
+  <img src="pics/qa-replay-step-en.png" alt="Replay timeline" width="100%" />
+  <br /><sub>11 dots along the bottom = the full signal path. Scrub, replay, or slow it down.</sub>
+</td>
+</tr>
+</table>
+
+</details>
 
 ---
 
@@ -112,6 +147,8 @@ npm start
 ```
 
 ✅ Open `http://localhost:3000` and start your cryptographic journey.
+
+> 💡 On first launch a 3-step **field manual** walks you through loading rotors, striking keys, and watching the current. Skip it any time — or reopen it from the **Manual** button in the topbar.
 
 ### 3️⃣ (Optional) Try the plugboard prototype alone
 
