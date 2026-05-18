@@ -1,57 +1,104 @@
+/* Single-viewport bento grid */
 .enigma-machine {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 24px 18px 48px;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: 56px 1fr 112px;
+  grid-template-columns:
+    clamp(220px, 18vw, 288px)
+    1fr
+    clamp(240px, 22vw, 340px);
+  grid-template-areas:
+    'top  top  top'
+    'rail core side'
+    'plug plug plug';
+  gap: 10px;
+  padding: 10px;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
-.enigma-machine > * {
-  animation: part-drop 520ms var(--ease-out) backwards;
+.enigma-topbar {
+  grid-area: top;
+  min-height: 0;
 }
-.enigma-machine > *:nth-child(1) { animation-delay: 0ms; }
-.enigma-machine > *:nth-child(2) { animation-delay: 60ms; }
-.enigma-machine > *:nth-child(3) { animation-delay: 120ms; }
-.enigma-machine > *:nth-child(4) { animation-delay: 180ms; }
-.enigma-machine > *:nth-child(5) { animation-delay: 240ms; }
-.enigma-machine > *:nth-child(6) { animation-delay: 300ms; }
-.enigma-machine > *:nth-child(7) { animation-delay: 360ms; }
-.enigma-machine > *:nth-child(8) { animation-delay: 420ms; }
-
-.enigma-machine > .onboarding-scrim,
-.enigma-machine > .sr-only {
-  animation: none;
+.config-rail {
+  grid-area: rail;
+  min-height: 0;
+  overflow: auto;
+}
+.machine-core {
+  grid-area: core;
+  min-height: 0;
+  min-width: 0;
+}
+.machine-side {
+  grid-area: side;
+  min-height: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+}
+.machine-side > * {
+  min-height: 0;
+}
+.plug-strip {
+  grid-area: plug;
+  min-height: 0;
 }
 
-@keyframes part-drop {
-  from {
-    opacity: 0;
-    transform: translateY(-14px);
+/* Narrow-screen fallback */
+@media (max-width: 760px) {
+  .enigma-machine,
+  .enigma-machine--narrow {
+    height: auto;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    grid-template-areas: none;
+    gap: 18px;
+    padding: 16px 12px 40px;
+    max-width: 720px;
+    margin: 0 auto;
+    overflow: visible;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
-/* 故障指示 */
-.machine-fault {
+/* Fault toast (slides in below the top bar) */
+.machine-fault-toast {
+  position: fixed;
+  top: 64px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
   display: flex;
   align-items: center;
   gap: 10px;
   font-family: var(--font-type);
   font-size: 14px;
   color: var(--ink);
-  background-color: rgba(179, 66, 46, 0.22);
+  background-color: rgba(40, 24, 18, 0.96);
   border: 1px solid var(--danger);
   border-radius: 6px;
-  padding: 12px 16px;
+  padding: 10px 18px;
+  box-shadow: var(--shadow-raised);
+  animation: fault-slide 240ms var(--ease-out);
+}
+
+@keyframes fault-slide {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
 .fault-lamp {
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
   background: var(--danger);
   box-shadow: 0 0 10px 2px var(--danger);
@@ -70,7 +117,7 @@
   }
 }
 
-/* 加载态 */
+/* Loading state */
 .enigma-loading {
   display: flex;
   flex-direction: column;
@@ -95,12 +142,5 @@
 @keyframes disc-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 600px) {
-  .enigma-machine {
-    padding: 14px 10px 40px;
-    gap: 16px;
   }
 }

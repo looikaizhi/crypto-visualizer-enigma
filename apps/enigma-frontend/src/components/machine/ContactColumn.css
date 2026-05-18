@@ -1,0 +1,49 @@
+.cc-bg {
+  fill: rgba(0, 0, 0, 0.22);
+  stroke: rgba(212, 164, 92, 0.12);
+  stroke-width: 1;
+}
+
+.cc-wire {
+  stroke: rgba(212, 164, 92, 0.18);
+  stroke-width: 1;
+  fill: none;
+}
+
+.cc-wire--plugged {
+  stroke: var(--brass-light);
+  stroke-width: 1.6;
+  opacity: 0.8;
+}
+
+.cc-wire--ukw {
+  stroke: rgba(212, 164, 92, 0.32);
+  stroke-width: 1.2;
+  fill: none;
+}
+
+.cc-dot {
+  fill: var(--contact-dot);
+  opacity: 0.62;
+}
+
+.cc-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  fill: var(--ink-muted);
+  pointer-events: none;
+  user-select: none;
+}
+
+.cc-hit {
+  fill: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.cc-hit:hover,
+.cc-hit:focus-visible {
+  fill: rgba(244, 201, 119, 0.16);
+  stroke: var(--brass-light);
+  stroke-width: 1.5;
+}

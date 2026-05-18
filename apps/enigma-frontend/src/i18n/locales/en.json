@@ -1,0 +1,262 @@
+{
+  "common": {
+    "on": "On",
+    "off": "Off"
+  },
+  "plate": {
+    "title": "ENIGMA",
+    "subtitle": "Chiffriermaschine · Cipher Machine Simulator",
+    "action": {
+      "sound": {
+        "label": "Sound {{state}}",
+        "on": "Turn sound on",
+        "off": "Turn sound off"
+      },
+      "help": {
+        "label": "Manual",
+        "aria": "Open the operating manual"
+      },
+      "preset": {
+        "label": "Load Key",
+        "aria": "Load a preset key"
+      },
+      "reset": {
+        "label": "Reset",
+        "aria": "Reset the machine"
+      }
+    }
+  },
+  "loading": {
+    "assembling": "Assembling the cipher machine…"
+  },
+  "error": {
+    "rotors": {
+      "incomplete": "Please select all three rotors first",
+      "invalid": "Invalid rotor selection (rotor index)"
+    },
+    "reflector": {
+      "missing": "Please select a reflector"
+    },
+    "plug": {
+      "selfLoop": "A plugboard letter cannot connect to itself",
+      "duplicate": "A plugboard letter is used more than once"
+    },
+    "api": {
+      "detail": "Configuration error: {{detail}}",
+      "fallback": "Request failed, please check the rotor configuration",
+      "rejected": "Request rejected"
+    },
+    "init": {
+      "failed": "Initialization failed, please refresh the page and retry"
+    }
+  },
+  "announce": {
+    "encrypted": "Letter {{plain}} encrypted to {{cipher}}"
+  },
+  "language": {
+    "switcher": {
+      "aria": "Switch language"
+    },
+    "option": {
+      "en": "EN",
+      "zh": "中"
+    }
+  },
+  "onboarding": {
+    "aria": "Operating manual",
+    "title": "Field Manual",
+    "intro": "Welcome to the Enigma cipher machine. Three steps to send your first dispatch:",
+    "step": {
+      "rotors": {
+        "title": "Load the rotors",
+        "body": "Pick three rotor models in the rotor bank, then turn the brass arrows to set the start positions."
+      },
+      "keys": {
+        "title": "Strike the keys",
+        "body": "Click the keyboard or type letters on your physical keyboard — the rotors step with each press."
+      },
+      "current": {
+        "title": "Watch the current",
+        "body": "The lampboard lights the ciphertext; the signal-path panel lights the current's route through the machine segment by segment."
+      }
+    },
+    "action": {
+      "start": "Load the daily key and begin",
+      "skip": "I'll explore myself"
+    }
+  },
+  "rotor": {
+    "aria": "Rotor {{n}}",
+    "position": {
+      "up": "Rotor {{n}} start position up",
+      "down": "Rotor {{n}} start position down"
+    },
+    "field": {
+      "model": "Model",
+      "ring": "Ring"
+    },
+    "option": {
+      "placeholder": "Select",
+      "item": "Rotor {{index}}"
+    }
+  },
+  "lamp": {
+    "aria": {
+      "board": "Lampboard",
+      "letter": "Letter {{letter}} lamp, {{state}}"
+    },
+    "state": {
+      "on": "lit",
+      "off": "off"
+    }
+  },
+  "reflector": {
+    "aria": {
+      "group": "Reflector",
+      "cycle": "Reflector {{value}}, click to switch"
+    },
+    "hint": "Reflector"
+  },
+  "contact": {
+    "aria": {
+      "left": "{{id}} left contact {{label}}",
+      "right": "{{id}} right contact {{label}}"
+    }
+  },
+  "tape": {
+    "input": {
+      "label": "INPUT · KLARTEXT",
+      "empty": "Strike a key to start encrypting…"
+    },
+    "output": {
+      "label": "OUTPUT · GEHEIMTEXT",
+      "empty": "Ciphertext will surface here letter by letter…"
+    },
+    "copy": {
+      "idle": "Copy ciphertext",
+      "done": "Copied"
+    },
+    "placeholder": {
+      "in": "Plaintext…",
+      "out": "Ciphertext…"
+    }
+  },
+  "rail": {
+    "aria": "Machine settings",
+    "title": "Settings · Einstellung",
+    "action": {
+      "preset": "Load preset",
+      "reset": "Reset positions",
+      "reflector": "Switch reflector · UKW-{{value}}"
+    },
+    "toggle": {
+      "ring": "Show ring setting (Ring)",
+      "step": "Step mode",
+      "slow": "Slow mode"
+    },
+    "snapshot": {
+      "head": "Current setup snapshot",
+      "rotor": "R{{n}} · {{index}} / pos {{position}}",
+      "ring": " / ring {{ring}}",
+      "reflector": "Reflector UKW-{{value}}",
+      "plugs": "Plugs · {{count}}"
+    }
+  },
+  "signal": {
+    "stage": {
+      "key": "Keyboard",
+      "plug": "Plugboard",
+      "rotor": "Rotor {{model}}",
+      "rotorPlain": "Rotor",
+      "reflector": "Reflector",
+      "lamp": "Lampboard"
+    },
+    "title": "Signal Path · Stromweg",
+    "empty": "After you strike a key, the current's route through the machine lights up here segment by segment.",
+    "nav": {
+      "prev": "Previous segment",
+      "next": "Next segment"
+    },
+    "speed": {
+      "normal": "Normal",
+      "slow": "Slow"
+    },
+    "action": {
+      "replay": "Replay"
+    },
+    "mode": {
+      "step": "Step"
+    }
+  },
+  "core": {
+    "aria": "Machine interior · MachineCore",
+    "title": "Signal Path · Stromweg",
+    "legend": {
+      "fwd": "Forward",
+      "back": "Return"
+    },
+    "cap": {
+      "plugboard": "Plugboard",
+      "reflector": "Reflector UKW-{{value}}"
+    },
+    "field": {
+      "model": "Model"
+    },
+    "ariaCtl": {
+      "model": "{{col}} rotor model",
+      "posDown": "{{col}} position down",
+      "posUp": "{{col}} position up",
+      "ring": "{{col}} ring setting",
+      "dots": "Step timeline"
+    },
+    "nav": {
+      "prev": "Previous segment",
+      "next": "Next segment"
+    },
+    "speed": {
+      "normal": "Normal",
+      "slow": "Slow"
+    },
+    "action": {
+      "replayAria": "Replay",
+      "replayLabel": "▶▌ Replay"
+    },
+    "mode": {
+      "step": "Step"
+    },
+    "idle": "Strike a key and the current will pass through Plugboard · R3 · R2 · R1 · Reflector, then return the same way.",
+    "hover": {
+      "plugIdle": "Plugboard {{letter}} · not patched",
+      "plugLinked": "Plugboard {{from}} ↔ {{to}}",
+      "reflector": "Reflector {{from}} ↔ {{to}}",
+      "rotorFwd": "{{col}} outer ring {{from}} → inner contact {{to}}",
+      "rotorBack": "{{col}} inner contact {{from}} ← outer ring {{to}}"
+    }
+  },
+  "rotorBank": {
+    "title": "Rotor Bank · Walzenlage",
+    "cover": {
+      "open": "Lift cover · Advanced",
+      "close": "Close cover"
+    }
+  },
+  "keyboard": {
+    "aria": {
+      "board": "Enigma keyboard",
+      "key": "Letter {{letter}} key"
+    }
+  },
+  "plugboard": {
+    "title": "Plugboard · Steckerbrett",
+    "count": "{{count}} / {{max}} pairs",
+    "compact": "Plugboard {{count}}/{{max}}",
+    "error": {
+      "max": "The plugboard takes at most {{max}} plug pairs"
+    },
+    "hint": "Click two letters to connect a pair; click a wired letter to unplug.",
+    "aria": {
+      "wired": "Letter {{letter}} wired, click to unplug",
+      "open": "Letter {{letter}} socket, click to connect"
+    }
+  }
+}

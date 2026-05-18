@@ -1,10 +1,16 @@
 .lamp-panel {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.lamp-grid {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 22px 18px;
-  border-radius: 10px;
 }
 
 .lamp-row {
@@ -52,6 +58,42 @@
   color: #3a2400;
   text-shadow: 0 0 6px rgba(255, 255, 255, 0.8);
   transition: color 80ms ease-out;
+}
+
+/* Compact mode (inside the side rail) */
+.lamp-panel--compact {
+  padding: 10px;
+  gap: 8px;
+  height: 100%;
+  justify-content: center;
+}
+
+.lamp-panel--compact .lamp-grid {
+  gap: 5px;
+  width: 100%;
+}
+
+.lamp-panel--compact .lamp-row {
+  gap: 5px;
+  width: 100%;
+  justify-content: center;
+}
+
+.lamp-panel--compact .lamp-row:nth-child(2) {
+  padding: 0 6%;
+}
+
+.lamp-panel--compact .lamp {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+  height: auto;
+  aspect-ratio: 1;
+  border-width: 1px;
+}
+
+.lamp-panel--compact .lamp-letter {
+  font-size: clamp(9px, 1.4vw, 14px);
 }
 
 @media (max-width: 600px) {

@@ -1,0 +1,52 @@
+.core-tape {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 5px;
+  background: var(--bakelite);
+  box-shadow: var(--shadow-recessed);
+  border: 1px solid #000;
+}
+
+.core-tape-label {
+  font-family: var(--font-plate);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+  color: var(--ink-muted);
+}
+
+.core-tape--out .core-tape-label {
+  color: var(--brass-light);
+}
+
+.core-tape-strip {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  direction: rtl;
+  text-overflow: clip;
+}
+
+.core-tape-text {
+  font-family: var(--font-type);
+  font-size: 15px;
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  unicode-bidi: plaintext;
+}
+
+.core-tape--out .core-tape-text {
+  color: var(--lamp-glow);
+}
+
+.core-tape-empty {
+  font-family: var(--font-type);
+  font-size: 12px;
+  color: var(--ink-muted);
+  opacity: 0.7;
+}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Reflector as ReflectorType } from '../../services/api';
 import './Reflector.css';
 
@@ -13,6 +14,7 @@ const Reflector: React.FC<ReflectorProps> = ({
   available,
   onChange,
 }) => {
+  const { t } = useTranslation();
   const cycle = () => {
     const order = available.length
       ? available.map((r) => r.index)
@@ -22,17 +24,17 @@ const Reflector: React.FC<ReflectorProps> = ({
   };
 
   return (
-    <div className="reflector" aria-label="反射器">
+    <div className="reflector" aria-label={t('reflector.aria.group')}>
       <span className="reflector-label engrave">UKW</span>
       <button
         type="button"
         className="reflector-disc focus-brass"
         onClick={cycle}
-        aria-label={`反射器 ${selected || 'B'}，点击切换`}
+        aria-label={t('reflector.aria.cycle', { value: selected || 'B' })}
       >
         <span className="reflector-glyph">{selected || 'B'}</span>
       </button>
-      <span className="reflector-hint engrave">反射器</span>
+      <span className="reflector-hint engrave">{t('reflector.hint')}</span>
     </div>
   );
 };

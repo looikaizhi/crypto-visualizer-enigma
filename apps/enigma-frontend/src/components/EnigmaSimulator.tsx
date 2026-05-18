@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import MachinePlate from './machine/MachinePlate';
 import RotorBank from './machine/RotorBank';
 import LampBoard from './machine/LampBoard';
@@ -6,17 +8,28 @@ import Keyboard from './machine/Keyboard';
 import Plugboard from './machine/Plugboard';
 import TapeDisplay from './machine/TapeDisplay';
 import SignalPath from './machine/SignalPath';
+import ConfigRail from './machine/ConfigRail';
+import MachineCore from './machine/MachineCore';
 import { buildTrace, TraceStage } from './machine/signal';
 import Onboarding from './onboarding/Onboarding';
 import { usePhysicalKeyboard } from '../hooks/usePhysicalKeyboard';
 import { useSound } from '../hooks/useSound';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import api, { Rotor, PlugPair, Reflector, RotorSelection } from '../services/api';
 import './EnigmaSimulator.css';
 
-type ValidationResult = { ok: true } | { ok: false; message: string };
+type ErrorKey =
+  | 'error.rotors.incomplete'
+  | 'error.rotors.invalid'
+  | 'error.reflector.missing'
+  | 'error.plug.selfLoop'
+  | 'error.plug.duplicate';
+
+type ValidationResult = { ok: true } | { ok: false; messageKey: ErrorKey };
 
 const VALID_ROTOR_INDICES = ['I', 'II', 'III', 'IV', 'V'];
 const VALID_REFLECTORS = ['A', 'B', 'C'];
+const REFLECTOR_CYCLE = ['A', 'B', 'C'];
 
 function validateConfig(
   rotors: RotorSelection[],
@@ -24,22 +37,22 @@ function validateConfig(
   plugPairs: PlugPair[],
 ): ValidationResult {
   if (rotors.length !== 3 || rotors.some((r) => !r.index)) {
-    return { ok: false, message: '请先选择全部三个转子 (rotor)' };
+    return { ok: false, messageKey: 'error.rotors.incomplete' };
   }
   if (rotors.some((r) => !VALID_ROTOR_INDICES.includes(r.index))) {
-    return { ok: false, message: '转子选择无效 (rotor index)' };
+    return { ok: false, messageKey: 'error.rotors.invalid' };
   }
   if (!VALID_REFLECTORS.includes(reflector)) {
-    return { ok: false, message: '请选择反射器 (reflector)' };
+    return { ok: false, messageKey: 'error.reflector.missing' };
   }
   const seen = new Set<string>();
   for (const p of plugPairs) {
     if (!p.from || !p.to) continue;
     if (p.from === p.to) {
-      return { ok: false, message: '插线板不能自连同一字母' };
+      return { ok: false, messageKey: 'error.plug.selfLoop' };
     }
     if (seen.has(p.from) || seen.has(p.to)) {
-      return { ok: false, message: '插线板字母重复使用' };
+      return { ok: false, messageKey: 'error.plug.duplicate' };
     }
     seen.add(p.from);
     seen.add(p.to);
@@ -47,20 +60,26 @@ function validateConfig(
   return { ok: true };
 }
 
-function extractApiError(err: any): string {
+function extractApiError(err: any, t: TFunction): string {
   const data = err?.response?.data;
   if (data?.detail) {
-    if (typeof data.detail === 'string') return `配置错误: ${data.detail}`;
+    if (typeof data.detail === 'string') {
+      return t('error.api.detail', { detail: data.detail });
+    }
     if (Array.isArray(data.detail) && data.detail.length > 0) {
       const first = data.detail[0];
       const loc = Array.isArray(first?.loc) ? first.loc.join('.') : '';
-      return `配置错误: ${first?.msg || '请求被拒绝'}${loc ? ` (${loc})` : ''}`;
+      const msg = first?.msg || t('error.api.rejected');
+      return t('error.api.detail', {
+        detail: `${msg}${loc ? ` (${loc})` : ''}`,
+      });
     }
   }
-  return '请求失败，请检查转子配置';
+  return t('error.api.fallback');
 }
 
 const EnigmaSimulator: React.FC = () => {
+  const { t } = useTranslation();
   const [availableRotors, setAvailableRotors] = useState<Rotor[]>([]);
   const [availableReflectors, setAvailableReflectors] = useState<Reflector[]>([]);
   const [selectedRotors, setSelectedRotors] = useState<RotorSelection[]>([
@@ -80,7 +99,11 @@ const EnigmaSimulator: React.FC = () => {
   const [trace, setTrace] = useState<TraceStage[] | null>(null);
   const [traceVersion, setTraceVersion] = useState<number>(0);
   const [announcement, setAnnouncement] = useState<string>('');
+  const [speed, setSpeed] = useState<'normal' | 'slow'>('normal');
+  const [stepMode, setStepMode] = useState<boolean>(false);
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
   const sound = useSound();
+  const narrow = useMediaQuery('(max-width: 760px)');
   const [showOnboarding, setShowOnboarding] = useState<boolean>(
     () => !localStorage.getItem('enigma-onboarded')
   );
@@ -108,12 +131,18 @@ const EnigmaSimulator: React.FC = () => {
         setAvailableReflectors(reflectorArray);
         setIsLoading(false);
       } catch (err) {
-        setError('初始化失败，请刷新页面重试');
+        setError(t('error.init.failed'));
         setIsLoading(false);
       }
     };
     initializeEnigma();
-  }, []);
+  }, [t]);
+
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(''), 3200);
+    return () => clearTimeout(t);
+  }, [error]);
 
   const handleKeyPress = useCallback(
     async (letter: string) => {
@@ -121,7 +150,7 @@ const EnigmaSimulator: React.FC = () => {
 
       const result = validateConfig(selectedRotors, selectedReflector, plugPairs);
       if (!result.ok) {
-        setError(result.message);
+        setError(t(result.messageKey));
         return;
       }
 
@@ -152,7 +181,12 @@ const EnigmaSimulator: React.FC = () => {
         );
         setActiveLetter(response.ciphertext);
         sound.playLamp();
-        setAnnouncement(`字母 ${letter} 加密为 ${response.ciphertext}`);
+        setAnnouncement(
+          t('announce.encrypted', {
+            plain: letter,
+            cipher: response.ciphertext,
+          })
+        );
         setTrace(
           buildTrace(letter, response, [
             selectedRotors[0].index,
@@ -164,12 +198,12 @@ const EnigmaSimulator: React.FC = () => {
         setError('');
         setTimeout(() => setActiveLetter(null), 500);
       } catch (err) {
-        setError(extractApiError(err));
+        setError(extractApiError(err, t));
       } finally {
         setIsEncrypting(false);
       }
     },
-    [isEncrypting, selectedRotors, selectedReflector, plugPairs, sound]
+    [isEncrypting, selectedRotors, selectedReflector, plugPairs, sound, t]
   );
 
   usePhysicalKeyboard(handleKeyPress, !isLoading && !isEncrypting);
@@ -227,26 +261,86 @@ const EnigmaSimulator: React.FC = () => {
     setError('');
   };
 
+  const handleReflectorCycle = () => {
+    const cur = REFLECTOR_CYCLE.indexOf(selectedReflector);
+    setSelectedReflector(REFLECTOR_CYCLE[(cur + 1) % REFLECTOR_CYCLE.length]);
+  };
+
   if (isLoading) {
     return (
       <div className="enigma-loading">
         <div className="enigma-loading-disc" />
-        <span>正在装配密码机…</span>
+        <span>{t('loading.assembling')}</span>
       </div>
     );
   }
 
+  const onboarding = showOnboarding && (
+    <Onboarding
+      onClose={dismissOnboarding}
+      onLoadPreset={() => {
+        handlePreset();
+        dismissOnboarding();
+      }}
+    />
+  );
+
+  const liveRegion = (
+    <div className="sr-only" aria-live="polite">
+      {announcement}
+    </div>
+  );
+
+  const faultToast = error && (
+    <div className="machine-fault-toast" role="alert">
+      <span className="fault-lamp" aria-hidden="true" />
+      {error}
+    </div>
+  );
+
+  /* Narrow screen: legacy vertical fallback. */
+  if (narrow) {
+    return (
+      <div className="enigma-machine enigma-machine--narrow">
+        {onboarding}
+        <MachinePlate
+          onReset={handleReset}
+          onPreset={handlePreset}
+          onHelp={() => setShowOnboarding(true)}
+          soundOn={sound.enabled}
+          onToggleSound={sound.toggle}
+        />
+        {liveRegion}
+        {faultToast}
+        <RotorBank
+          rotors={selectedRotors}
+          availableRotors={availableRotors}
+          selectedReflector={selectedReflector}
+          availableReflectors={availableReflectors}
+          onRotorChange={handleRotorChange}
+          onPositionChange={handlePositionChange}
+          onRingSettingChange={handleRingSettingChange}
+          onReflectorChange={setSelectedReflector}
+        />
+        <LampBoard activeLetter={activeLetter} />
+        <Keyboard
+          onKeyPress={handleKeyPress}
+          disabled={isEncrypting}
+          pressedKey={pressedKey}
+        />
+        <SignalPath trace={trace} version={traceVersion} />
+        <Plugboard plugPairs={plugPairs} onPlugPairsChange={setPlugPairs} />
+        <TapeDisplay inputText={inputText} outputText={outputText} />
+      </div>
+    );
+  }
+
+  /* Desktop: single-viewport bento layout. */
   return (
     <div className="enigma-machine">
-      {showOnboarding && (
-        <Onboarding
-          onClose={dismissOnboarding}
-          onLoadPreset={() => {
-            handlePreset();
-            dismissOnboarding();
-          }}
-        />
-      )}
+      {onboarding}
+      {liveRegion}
+      {faultToast}
 
       <MachinePlate
         onReset={handleReset}
@@ -256,40 +350,55 @@ const EnigmaSimulator: React.FC = () => {
         onToggleSound={sound.toggle}
       />
 
-      <div className="sr-only" aria-live="polite">
-        {announcement}
-      </div>
+      <ConfigRail
+        rotors={selectedRotors}
+        selectedReflector={selectedReflector}
+        plugPairCount={plugPairs.filter((p) => p.from && p.to).length}
+        showAdvanced={showAdvanced}
+        stepMode={stepMode}
+        slowMode={speed === 'slow'}
+        onPreset={handlePreset}
+        onReset={handleReset}
+        onReflectorCycle={handleReflectorCycle}
+        onToggleAdvanced={() => setShowAdvanced((v) => !v)}
+        onToggleStep={() => setStepMode((v) => !v)}
+        onToggleSlow={() => setSpeed((s) => (s === 'slow' ? 'normal' : 'slow'))}
+      />
 
-      {error && (
-        <div className="machine-fault" role="alert">
-          <span className="fault-lamp" aria-hidden="true" />
-          {error}
-        </div>
-      )}
-
-      <RotorBank
+      <MachineCore
         rotors={selectedRotors}
         availableRotors={availableRotors}
         selectedReflector={selectedReflector}
         availableReflectors={availableReflectors}
+        plugPairs={plugPairs}
+        trace={trace}
+        traceVersion={traceVersion}
+        showAdvanced={showAdvanced}
+        speed={speed}
+        stepMode={stepMode}
+        onSetSpeed={setSpeed}
+        onSetStepMode={setStepMode}
         onRotorChange={handleRotorChange}
         onPositionChange={handlePositionChange}
         onRingSettingChange={handleRingSettingChange}
-        onReflectorChange={setSelectedReflector}
       />
 
-      <LampBoard activeLetter={activeLetter} />
-      <Keyboard
-        onKeyPress={handleKeyPress}
-        disabled={isEncrypting}
-        pressedKey={pressedKey}
-      />
-
-      <SignalPath trace={trace} version={traceVersion} />
+      <div className="machine-side">
+        <LampBoard
+          activeLetter={activeLetter}
+          compact
+          outputText={outputText}
+        />
+        <Keyboard
+          onKeyPress={handleKeyPress}
+          disabled={isEncrypting}
+          pressedKey={pressedKey}
+          compact
+          inputText={inputText}
+        />
+      </div>
 
       <Plugboard plugPairs={plugPairs} onPlugPairsChange={setPlugPairs} />
-
-      <TapeDisplay inputText={inputText} outputText={outputText} />
     </div>
   );
 };

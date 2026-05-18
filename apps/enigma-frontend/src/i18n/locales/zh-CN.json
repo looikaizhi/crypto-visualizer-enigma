@@ -1,0 +1,262 @@
+{
+  "common": {
+    "on": "开",
+    "off": "关"
+  },
+  "plate": {
+    "title": "ENIGMA",
+    "subtitle": "Chiffriermaschine · 密码机模拟器",
+    "action": {
+      "sound": {
+        "label": "音效 {{state}}",
+        "on": "开启音效",
+        "off": "关闭音效"
+      },
+      "help": {
+        "label": "手册",
+        "aria": "打开操作手册"
+      },
+      "preset": {
+        "label": "装载密钥",
+        "aria": "装载预设密钥"
+      },
+      "reset": {
+        "label": "重置",
+        "aria": "重置机器"
+      }
+    }
+  },
+  "loading": {
+    "assembling": "正在装配密码机…"
+  },
+  "error": {
+    "rotors": {
+      "incomplete": "请先选择全部三个转子 (rotor)",
+      "invalid": "转子选择无效 (rotor index)"
+    },
+    "reflector": {
+      "missing": "请选择反射器 (reflector)"
+    },
+    "plug": {
+      "selfLoop": "插线板不能自连同一字母",
+      "duplicate": "插线板字母重复使用"
+    },
+    "api": {
+      "detail": "配置错误: {{detail}}",
+      "fallback": "请求失败，请检查转子配置",
+      "rejected": "请求被拒绝"
+    },
+    "init": {
+      "failed": "初始化失败，请刷新页面重试"
+    }
+  },
+  "announce": {
+    "encrypted": "字母 {{plain}} 加密为 {{cipher}}"
+  },
+  "language": {
+    "switcher": {
+      "aria": "切换语言"
+    },
+    "option": {
+      "en": "EN",
+      "zh": "中"
+    }
+  },
+  "onboarding": {
+    "aria": "操作手册",
+    "title": "作战手册",
+    "intro": "欢迎操作 Enigma 密码机。三步即可发出第一份密电：",
+    "step": {
+      "rotors": {
+        "title": "装入转子",
+        "body": "在转子仓选择三个转子型号，拨动黄铜箭头设定起始位置。"
+      },
+      "keys": {
+        "title": "敲击键盘",
+        "body": "点击键盘或直接用物理键盘输入字母 —— 转子会随之步进。"
+      },
+      "current": {
+        "title": "观察电流",
+        "body": "灯板会亮起密文；信号路径面板逐段点亮电流穿过机器的轨迹。"
+      }
+    },
+    "action": {
+      "start": "装载每日密钥并开始",
+      "skip": "我自己来"
+    }
+  },
+  "rotor": {
+    "aria": "转子 {{n}}",
+    "position": {
+      "up": "转子 {{n}} 起始位置上调",
+      "down": "转子 {{n}} 起始位置下调"
+    },
+    "field": {
+      "model": "型号",
+      "ring": "环位"
+    },
+    "option": {
+      "placeholder": "选择",
+      "item": "转子 {{index}}"
+    }
+  },
+  "lamp": {
+    "aria": {
+      "board": "指示灯板",
+      "letter": "字母 {{letter}} 指示灯，{{state}}"
+    },
+    "state": {
+      "on": "点亮",
+      "off": "熄灭"
+    }
+  },
+  "reflector": {
+    "aria": {
+      "group": "反射器",
+      "cycle": "反射器 {{value}}，点击切换"
+    },
+    "hint": "反射器"
+  },
+  "contact": {
+    "aria": {
+      "left": "{{id}} 左触点 {{label}}",
+      "right": "{{id}} 右触点 {{label}}"
+    }
+  },
+  "tape": {
+    "input": {
+      "label": "输入 · KLARTEXT",
+      "empty": "敲击键盘开始加密…"
+    },
+    "output": {
+      "label": "输出 · GEHEIMTEXT",
+      "empty": "密文将在此处逐字浮现…"
+    },
+    "copy": {
+      "idle": "复制密文",
+      "done": "已复制"
+    },
+    "placeholder": {
+      "in": "明文…",
+      "out": "密文…"
+    }
+  },
+  "rail": {
+    "aria": "机器设置",
+    "title": "设置 · Einstellung",
+    "action": {
+      "preset": "预设装配",
+      "reset": "重置位置",
+      "reflector": "切换反射器 · UKW-{{value}}"
+    },
+    "toggle": {
+      "ring": "显示环位 (Ring)",
+      "step": "单步模式",
+      "slow": "慢速模式"
+    },
+    "snapshot": {
+      "head": "当前装配快照",
+      "rotor": "R{{n}} · {{index}} / 位置 {{position}}",
+      "ring": " / 环 {{ring}}",
+      "reflector": "反射器 UKW-{{value}}",
+      "plugs": "插线 {{count}} 对"
+    }
+  },
+  "signal": {
+    "stage": {
+      "key": "键盘",
+      "plug": "插线板",
+      "rotor": "转子 {{model}}",
+      "rotorPlain": "转子",
+      "reflector": "反射器",
+      "lamp": "灯板"
+    },
+    "title": "信号路径 · Stromweg",
+    "empty": "敲击键盘后，这里会逐段点亮电流穿过机器的路径。",
+    "nav": {
+      "prev": "上一段",
+      "next": "下一段"
+    },
+    "speed": {
+      "normal": "正常",
+      "slow": "慢放"
+    },
+    "action": {
+      "replay": "重播"
+    },
+    "mode": {
+      "step": "单步"
+    }
+  },
+  "core": {
+    "aria": "机器内部 · MachineCore",
+    "title": "电流路径 · Stromweg",
+    "legend": {
+      "fwd": "去程",
+      "back": "回程"
+    },
+    "cap": {
+      "plugboard": "插线板",
+      "reflector": "反射器 UKW-{{value}}"
+    },
+    "field": {
+      "model": "型号"
+    },
+    "ariaCtl": {
+      "model": "{{col}} 转子型号",
+      "posDown": "{{col}} 位置减一",
+      "posUp": "{{col}} 位置加一",
+      "ring": "{{col}} 环位",
+      "dots": "步进时间轴"
+    },
+    "nav": {
+      "prev": "上一段",
+      "next": "下一段"
+    },
+    "speed": {
+      "normal": "正常",
+      "slow": "慢"
+    },
+    "action": {
+      "replayAria": "重播",
+      "replayLabel": "▶▌重播"
+    },
+    "mode": {
+      "step": "单步"
+    },
+    "idle": "敲击键盘，电流将穿过 插线板 · R3 · R2 · R1 · 反射器 再原路返回。",
+    "hover": {
+      "plugIdle": "插线板 {{letter}} · 未跳线",
+      "plugLinked": "插线板 {{from}} ↔ {{to}}",
+      "reflector": "反射器 {{from}} ↔ {{to}}",
+      "rotorFwd": "{{col}} 外环 {{from}} → 内触点 {{to}}",
+      "rotorBack": "{{col}} 内触点 {{from}} ← 外环 {{to}}"
+    }
+  },
+  "rotorBank": {
+    "title": "转子仓 · Walzenlage",
+    "cover": {
+      "open": "掀盖 · 高级设置",
+      "close": "合上盖板"
+    }
+  },
+  "keyboard": {
+    "aria": {
+      "board": "Enigma 键盘",
+      "key": "字母 {{letter}} 键"
+    }
+  },
+  "plugboard": {
+    "title": "插线板 · Steckerbrett",
+    "count": "{{count}} / {{max}} 对",
+    "compact": "插线板 {{count}}/{{max}}",
+    "error": {
+      "max": "插线板最多 {{max}} 对跳线"
+    },
+    "hint": "点击两个字母连成一对；点击已接线字母可拔出。",
+    "aria": {
+      "wired": "字母 {{letter}} 已接线，点击拔出",
+      "open": "字母 {{letter}} 插孔，点击连线"
+    }
+  }
+}

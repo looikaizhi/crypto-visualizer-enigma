@@ -1,4 +1,6 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 import './MachinePlate.css';
 
 interface MachinePlateProps {
@@ -16,12 +18,13 @@ const MachinePlate: React.FC<MachinePlateProps> = ({
   soundOn,
   onToggleSound,
 }) => {
+  const { t } = useTranslation();
   return (
-    <header className="machine-plate mat-brass">
+    <header className="machine-plate enigma-topbar mat-brass">
       <div className="plate-shine" aria-hidden="true" />
       <div className="plate-text">
-        <h1 className="plate-title emboss">ENIGMA</h1>
-        <span className="plate-sub emboss">Chiffriermaschine · 密码机模拟器</span>
+        <h1 className="plate-title emboss">{t('plate.title')}</h1>
+        <span className="plate-sub emboss">{t('plate.subtitle')}</span>
       </div>
       <div className="plate-knobs">
         <button
@@ -29,34 +32,37 @@ const MachinePlate: React.FC<MachinePlateProps> = ({
           className="knob-btn focus-brass"
           onClick={onToggleSound}
           aria-pressed={soundOn}
-          aria-label={soundOn ? '关闭音效' : '开启音效'}
+          aria-label={t(soundOn ? 'plate.action.sound.off' : 'plate.action.sound.on')}
         >
-          音效 {soundOn ? '开' : '关'}
+          {t('plate.action.sound.label', {
+            state: t(soundOn ? 'common.on' : 'common.off'),
+          })}
         </button>
         <button
           type="button"
           className="knob-btn focus-brass"
           onClick={onHelp}
-          aria-label="打开操作手册"
+          aria-label={t('plate.action.help.aria')}
         >
-          手册
+          {t('plate.action.help.label')}
         </button>
         <button
           type="button"
           className="knob-btn focus-brass"
           onClick={onPreset}
-          aria-label="装载预设密钥"
+          aria-label={t('plate.action.preset.aria')}
         >
-          装载密钥
+          {t('plate.action.preset.label')}
         </button>
         <button
           type="button"
           className="knob-btn focus-brass"
           onClick={onReset}
-          aria-label="重置机器"
+          aria-label={t('plate.action.reset.aria')}
         >
-          重置
+          {t('plate.action.reset.label')}
         </button>
+        <LanguageSwitcher />
       </div>
     </header>
   );

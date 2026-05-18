@@ -1,0 +1,53 @@
+/* Brass two-position toggle — language switcher.
+   Visuals strictly per i18n-plan §5.2; only tokens.css variables used. */
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  min-width: 88px;
+  min-height: 32px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--brass-light), var(--brass-dark));
+}
+
+.lang-seg {
+  flex: 1 1 auto;
+  min-width: 44px;
+  min-height: 24px;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  font: 600 12px var(--font-plate);
+  letter-spacing: 0.06em;
+  color: var(--brass-dark);
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 100ms ease, transform 80ms var(--ease-mech);
+}
+
+.lang-seg:hover {
+  opacity: 1;
+}
+
+.lang-seg:active {
+  transform: translateY(1px);
+}
+
+.lang-seg.is-active {
+  color: var(--ink);
+  opacity: 1;
+  box-shadow: var(--shadow-recessed);
+}
+
+/* Narrow screens (§5.3): shrink but never hide — language is a system control. */
+@media (max-width: 760px) {
+  .lang-toggle {
+    min-width: 72px;
+  }
+  .lang-seg {
+    padding: 2px 5px;
+    font-size: 10px;
+  }
+}

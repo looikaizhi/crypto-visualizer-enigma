@@ -9,6 +9,27 @@
   overflow: hidden;
 }
 
+/* Top bar variant: fixed 56px height, slimmer nameplate. */
+.machine-plate.enigma-topbar {
+  padding: 6px 22px;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.enigma-topbar .plate-title {
+  font-size: 22px;
+}
+
+.enigma-topbar .plate-sub {
+  font-size: 11px;
+}
+
+.enigma-topbar .knob-btn {
+  min-height: 38px;
+  padding: 6px 14px;
+  font-size: 12px;
+}
+
 .plate-shine {
   position: absolute;
   top: 0;

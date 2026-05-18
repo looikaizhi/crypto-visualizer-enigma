@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './TapeDisplay.css';
 
 interface TapeDisplayProps {
@@ -13,6 +14,7 @@ const TapeDisplay: React.FC<TapeDisplayProps> = ({
   inputText,
   outputText,
 }) => {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   const copyOutput = async () => {
@@ -22,40 +24,40 @@ const TapeDisplay: React.FC<TapeDisplayProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* 剪贴板不可用时静默 */
+      /* Stay silent when the clipboard is unavailable. */
     }
   };
 
   return (
     <section className="tape-display">
       <div className="tape">
-        <span className="tape-label engrave">输入 · KLARTEXT</span>
+        <span className="tape-label engrave">{t('tape.input.label')}</span>
         <div className="tape-strip tape-strip--in">
           {inputText ? (
             <span className="tape-text">{group5(inputText)}</span>
           ) : (
-            <span className="tape-empty">敲击键盘开始加密…</span>
+            <span className="tape-empty">{t('tape.input.empty')}</span>
           )}
         </div>
       </div>
 
       <div className="tape">
         <div className="tape-label-row">
-          <span className="tape-label engrave">输出 · GEHEIMTEXT</span>
+          <span className="tape-label engrave">{t('tape.output.label')}</span>
           <button
             type="button"
             className="tape-copy focus-brass"
             onClick={copyOutput}
             disabled={!outputText}
           >
-            {copied ? '已复制' : '复制密文'}
+            {copied ? t('tape.copy.done') : t('tape.copy.idle')}
           </button>
         </div>
         <div className="tape-strip tape-strip--out">
           {outputText ? (
             <span className="tape-text">{group5(outputText)}</span>
           ) : (
-            <span className="tape-empty">密文将在此处逐字浮现…</span>
+            <span className="tape-empty">{t('tape.output.empty')}</span>
           )}
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { TraceStage } from './signal';
 import './SignalPath.css';
 
@@ -15,6 +16,7 @@ const prefersReducedMotion = (): boolean =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
+  const { t } = useTranslation();
   const [speed, setSpeed] = useState<Speed>('normal');
   const [stepMode, setStepMode] = useState(false);
   const [revealed, setRevealed] = useState(0);
@@ -54,9 +56,9 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
     return (
       <section className="signal-path mat-wood">
         <div className="signal-rim">
-          <span className="signal-title emboss">信号路径 · Stromweg</span>
+          <span className="signal-title emboss">{t('signal.title')}</span>
         </div>
-        <p className="signal-empty">敲击键盘后，这里会逐段点亮电流穿过机器的路径。</p>
+        <p className="signal-empty">{t('signal.empty')}</p>
       </section>
     );
   }
@@ -68,7 +70,7 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
   return (
     <section className="signal-path mat-wood">
       <div className="signal-rim">
-        <span className="signal-title emboss">信号路径 · Stromweg</span>
+        <span className="signal-title emboss">{t('signal.title')}</span>
         <div className="signal-controls">
           {stepMode ? (
             <>
@@ -77,7 +79,7 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
                 className="signal-btn focus-brass"
                 onClick={stepBack}
                 disabled={revealed <= 1}
-                aria-label="上一段"
+                aria-label={t('signal.nav.prev')}
               >
                 ◀
               </button>
@@ -89,7 +91,7 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
                 className="signal-btn focus-brass"
                 onClick={stepFwd}
                 disabled={revealed >= total}
-                aria-label="下一段"
+                aria-label={t('signal.nav.next')}
               >
                 ▶
               </button>
@@ -103,7 +105,7 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
                 }`}
                 onClick={() => setSpeed('normal')}
               >
-                正常
+                {t('signal.speed.normal')}
               </button>
               <button
                 type="button"
@@ -112,14 +114,14 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
                 }`}
                 onClick={() => setSpeed('slow')}
               >
-                慢放
+                {t('signal.speed.slow')}
               </button>
               <button
                 type="button"
                 className="signal-btn focus-brass"
                 onClick={() => setReplay((r) => r + 1)}
               >
-                重播
+                {t('signal.action.replay')}
               </button>
             </>
           )}
@@ -130,7 +132,7 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
             }`}
             onClick={() => setStepMode((v) => !v)}
           >
-            单步
+            {t('signal.mode.step')}
           </button>
         </div>
       </div>
@@ -152,7 +154,9 @@ const SignalPath: React.FC<SignalPathProps> = ({ trace, version }) => {
                   lit ? ' signal-node--live' : ''
                 }${isHead ? ' signal-node--head' : ''}`}
               >
-                <span className="signal-node-label">{stage.label}</span>
+                <span className="signal-node-label">
+                  {t(stage.labelKey, stage.labelParams)}
+                </span>
                 <span className="signal-node-letter">{stage.letter}</span>
               </div>
             </div>

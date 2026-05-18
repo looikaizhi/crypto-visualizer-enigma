@@ -1,5 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { QWERTZ_ROWS } from './layout';
+import { ALPHA } from './core';
+import { useMediaQuery } from '../../hooks/useMediaQuery';
 import type { PlugPair } from '../../services/api';
 import './Plugboard.css';
 
@@ -9,15 +12,14 @@ interface PlugboardProps {
 }
 
 const MAX_PAIRS = 10;
+const CABLE_COLORS = ['#c0563b', '#3f6f8c', '#8a7a3a', '#6e6256', '#7a4a5e'];
+
+/* Legacy three-row geometry (used for the narrow-screen fallback). */
 const CELL = 54;
 const SOCKET = 44;
 const ROW_H = 64;
-const CABLE_COLORS = ['#c0563b', '#3f6f8c', '#8a7a3a', '#6e6256', '#7a4a5e'];
-
 const boardWidth =
   Math.max(...QWERTZ_ROWS.map((r) => r.length)) * CELL - (CELL - SOCKET);
-
-/* 计算每个字母插孔的中心坐标 */
 const SOCKET_POS: Record<string, { x: number; y: number }> = {};
 QWERTZ_ROWS.forEach((row, ri) => {
   const rowWidth = row.length * CELL - (CELL - SOCKET);
@@ -35,8 +37,21 @@ const Plugboard: React.FC<PlugboardProps> = ({
   plugPairs,
   onPlugPairsChange,
 }) => {
+  const { t } = useTranslation();
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState('');
+  const narrow = useMediaQuery('(max-width: 760px)');
+  const stripRef = useRef<HTMLDivElement>(null);
+  const [stripW, setStripW] = useState(1024);
+
+  useEffect(() => {
+    const el = stripRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setStripW(el.clientWidth));
+    ro.observe(el);
+    setStripW(el.clientWidth);
+    return () => ro.disconnect();
+  }, [narrow]);
 
   const validPairs = useMemo(
     () => plugPairs.filter((p) => p.from && p.to && p.from !== p.to),
@@ -53,7 +68,6 @@ const Plugboard: React.FC<PlugboardProps> = ({
 
   const handleSocket = (letter: string) => {
     setError('');
-    // 已连接的孔：拔出整对
     if (used.has(letter)) {
       onPlugPairsChange(
         plugPairs.filter((p) => p.from !== letter && p.to !== letter)
@@ -70,7 +84,7 @@ const Plugboard: React.FC<PlugboardProps> = ({
       return;
     }
     if (validPairs.length >= MAX_PAIRS) {
-      setError(`插线板最多 ${MAX_PAIRS} 对跳线`);
+      setError(t('plugboard.error.max', { max: MAX_PAIRS }));
       setPending(null);
       return;
     }
@@ -78,83 +92,148 @@ const Plugboard: React.FC<PlugboardProps> = ({
     setPending(null);
   };
 
-  return (
-    <section className="plugboard mat-wood">
-      <div className="plugboard-rim">
-        <span className="plugboard-title emboss">
-          插线板 · Steckerbrett
-        </span>
-        <span className="plugboard-count engrave">
-          {validPairs.length} / {MAX_PAIRS} 对
-        </span>
-      </div>
-
-      {error && (
-        <div className="plugboard-error" role="alert">
-          {error}
+  /* Narrow-screen fallback: legacy three-row layout. */
+  if (narrow) {
+    return (
+      <section className="plugboard mat-wood">
+        <div className="plugboard-rim">
+          <span className="plugboard-title emboss">{t('plugboard.title')}</span>
+          <span className="plugboard-count engrave">
+            {t('plugboard.count', {
+              count: validPairs.length,
+              max: MAX_PAIRS,
+            })}
+          </span>
         </div>
-      )}
-
-      <div
-        className="plugboard-panel mat-bakelite"
-        style={{ width: boardWidth, height: boardHeight }}
-      >
-        <svg
-          className="plugboard-cables"
-          width={boardWidth}
-          height={boardHeight}
-          aria-hidden="true"
+        {error && (
+          <div className="plugboard-error" role="alert">
+            {error}
+          </div>
+        )}
+        <div
+          className="plugboard-panel mat-bakelite"
+          style={{ width: boardWidth, height: boardHeight }}
         >
-          {validPairs.map((p, i) => {
-            const a = SOCKET_POS[p.from];
-            const b = SOCKET_POS[p.to];
-            if (!a || !b) return null;
-            const sag = Math.max(a.y, b.y) + 38;
-            const midX = (a.x + b.x) / 2;
-            const color = CABLE_COLORS[i % CABLE_COLORS.length];
+          <svg
+            className="plugboard-cables"
+            width={boardWidth}
+            height={boardHeight}
+            aria-hidden="true"
+          >
+            {validPairs.map((p, i) => {
+              const a = SOCKET_POS[p.from];
+              const b = SOCKET_POS[p.to];
+              if (!a || !b) return null;
+              const sag = Math.max(a.y, b.y) + 38;
+              const midX = (a.x + b.x) / 2;
+              const color = CABLE_COLORS[i % CABLE_COLORS.length];
+              return (
+                <path
+                  key={`${p.from}-${p.to}`}
+                  d={`M ${a.x} ${a.y} Q ${midX} ${sag} ${b.x} ${b.y}`}
+                  stroke={color}
+                  strokeWidth={6}
+                  fill="none"
+                  strokeLinecap="round"
+                />
+              );
+            })}
+          </svg>
+          {QWERTZ_ROWS.flat().map((ch) => {
+            const pos = SOCKET_POS[ch];
+            const isUsed = used.has(ch);
+            const isPending = pending === ch;
             return (
-              <path
-                key={`${p.from}-${p.to}`}
-                d={`M ${a.x} ${a.y} Q ${midX} ${sag} ${b.x} ${b.y}`}
-                stroke={color}
-                strokeWidth={6}
-                fill="none"
-                strokeLinecap="round"
-              />
+              <button
+                key={ch}
+                type="button"
+                className={`plug-socket focus-brass${
+                  isUsed ? ' plug-socket--wired' : ''
+                }${isPending ? ' plug-socket--pending' : ''}`}
+                style={{ left: pos.x - SOCKET / 2, top: pos.y - SOCKET / 2 }}
+                onClick={() => handleSocket(ch)}
+                aria-label={t(
+                  isUsed ? 'plugboard.aria.wired' : 'plugboard.aria.open',
+                  { letter: ch }
+                )}
+              >
+                {ch}
+              </button>
             );
           })}
-        </svg>
+        </div>
+        <p className="plugboard-hint">{t('plugboard.hint')}</p>
+      </section>
+    );
+  }
 
-        {QWERTZ_ROWS.flat().map((ch) => {
-          const pos = SOCKET_POS[ch];
+  /* Desktop: single-row 26-socket strip. */
+  const STRIP_H = 112;
+  const SOCKET_Y = 30;
+  const ARC_SAG = 96;
+  const colX = (i: number) => ((i + 0.5) * stripW) / 26;
+
+  return (
+    <section className="plug-strip mat-wood" ref={stripRef}>
+      <div className="plug-strip-badge">
+        <span className="plug-strip-count engrave">
+          {t('plugboard.compact', {
+            count: validPairs.length,
+            max: MAX_PAIRS,
+          })}
+        </span>
+        {error && <span className="plug-strip-error">{error}</span>}
+      </div>
+
+      <svg
+        className="plug-strip-cables"
+        width={stripW}
+        height={STRIP_H}
+        viewBox={`0 0 ${stripW} ${STRIP_H}`}
+        aria-hidden="true"
+      >
+        {validPairs.map((p, i) => {
+          const ax = colX(ALPHA.indexOf(p.from));
+          const bx = colX(ALPHA.indexOf(p.to));
+          const midX = (ax + bx) / 2;
+          const color = CABLE_COLORS[i % CABLE_COLORS.length];
+          return (
+            <path
+              key={`${p.from}-${p.to}`}
+              d={`M ${ax} ${SOCKET_Y + 16} Q ${midX} ${ARC_SAG} ${bx} ${
+                SOCKET_Y + 16
+              }`}
+              stroke={color}
+              strokeWidth={5}
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+        })}
+      </svg>
+
+      <div className="plug-strip-row">
+        {ALPHA.map((ch) => {
           const isUsed = used.has(ch);
           const isPending = pending === ch;
           return (
             <button
               key={ch}
               type="button"
-              className={`plug-socket focus-brass${
-                isUsed ? ' plug-socket--wired' : ''
-              }${isPending ? ' plug-socket--pending' : ''}`}
-              style={{
-                left: pos.x - SOCKET / 2,
-                top: pos.y - SOCKET / 2,
-              }}
+              className={`plug-strip-socket focus-brass${
+                isUsed ? ' plug-strip-socket--wired' : ''
+              }${isPending ? ' plug-strip-socket--pending' : ''}`}
               onClick={() => handleSocket(ch)}
-              aria-label={
-                isUsed
-                  ? `字母 ${ch} 已接线，点击拔出`
-                  : `字母 ${ch} 插孔，点击连线`
-              }
+              aria-label={t(
+                isUsed ? 'plugboard.aria.wired' : 'plugboard.aria.open',
+                { letter: ch }
+              )}
             >
               {ch}
             </button>
           );
         })}
       </div>
-      <p className="plugboard-hint">
-        点击两个字母连成一对；点击已接线字母可拔出。
-      </p>
     </section>
   );
 };

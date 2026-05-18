@@ -7,7 +7,7 @@ interface SoundApi {
   playLamp: () => void;
 }
 
-/* 用 Web Audio 合成机械音，无需音频资源 */
+/* Synthesize mechanical sounds with Web Audio — no audio assets needed. */
 export function useSound(): SoundApi {
   const [enabled, setEnabled] = useState(false);
   const ctxRef = useRef<AudioContext | null>(null);
@@ -26,7 +26,7 @@ export function useSound(): SoundApi {
 
   const toggle = useCallback(() => setEnabled((v) => !v), []);
 
-  /* 键帽落下的低沉机械声 */
+  /* Deep mechanical thud of a keycap dropping. */
   const playKey = useCallback(() => {
     if (!enabled) return;
     const ctx = getCtx();
@@ -44,7 +44,7 @@ export function useSound(): SoundApi {
     osc.stop(t + 0.11);
   }, [enabled]);
 
-  /* 灯泡通电的清脆短音 */
+  /* Crisp short blip of a lamp lighting up. */
   const playLamp = useCallback(() => {
     if (!enabled) return;
     const ctx = getCtx();

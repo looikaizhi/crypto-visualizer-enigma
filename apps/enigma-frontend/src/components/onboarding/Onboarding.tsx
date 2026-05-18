@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Onboarding.css';
 
 interface OnboardingProps {
@@ -9,22 +10,23 @@ interface OnboardingProps {
 const STEPS = [
   {
     n: '1',
-    title: '装入转子',
-    body: '在转子仓选择三个转子型号，拨动黄铜箭头设定起始位置。',
+    titleKey: 'onboarding.step.rotors.title',
+    bodyKey: 'onboarding.step.rotors.body',
   },
   {
     n: '2',
-    title: '敲击键盘',
-    body: '点击键盘或直接用物理键盘输入字母 —— 转子会随之步进。',
+    titleKey: 'onboarding.step.keys.title',
+    bodyKey: 'onboarding.step.keys.body',
   },
   {
     n: '3',
-    title: '观察电流',
-    body: '灯板会亮起密文；信号路径面板逐段点亮电流穿过机器的轨迹。',
+    titleKey: 'onboarding.step.current.title',
+    bodyKey: 'onboarding.step.current.body',
   },
-];
+] as const;
 
 const Onboarding: React.FC<OnboardingProps> = ({ onClose, onLoadPreset }) => {
+  const { t } = useTranslation();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -43,15 +45,13 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose, onLoadPreset }) => {
         className="onboarding-card mat-wood"
         role="dialog"
         aria-modal="true"
-        aria-label="操作手册"
+        aria-label={t('onboarding.aria')}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="onboarding-head">
           <span className="onboarding-stamp">STRENG GEHEIM</span>
-          <h2 className="onboarding-title emboss">作战手册</h2>
-          <p className="onboarding-lead">
-            欢迎操作 Enigma 密码机。三步即可发出第一份密电：
-          </p>
+          <h2 className="onboarding-title emboss">{t('onboarding.title')}</h2>
+          <p className="onboarding-lead">{t('onboarding.intro')}</p>
         </div>
 
         <ol className="onboarding-steps">
@@ -59,8 +59,8 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose, onLoadPreset }) => {
             <li className="onboarding-step" key={s.n}>
               <span className="onboarding-num">{s.n}</span>
               <div>
-                <h3 className="onboarding-step-title">{s.title}</h3>
-                <p className="onboarding-step-body">{s.body}</p>
+                <h3 className="onboarding-step-title">{t(s.titleKey)}</h3>
+                <p className="onboarding-step-body">{t(s.bodyKey)}</p>
               </div>
             </li>
           ))}
@@ -72,14 +72,14 @@ const Onboarding: React.FC<OnboardingProps> = ({ onClose, onLoadPreset }) => {
             className="onboarding-btn onboarding-btn--primary focus-brass"
             onClick={onLoadPreset}
           >
-            装载每日密钥并开始
+            {t('onboarding.action.start')}
           </button>
           <button
             type="button"
             className="onboarding-btn focus-brass"
             onClick={onClose}
           >
-            我自己来
+            {t('onboarding.action.skip')}
           </button>
         </div>
       </div>

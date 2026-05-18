@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-/* 监听物理键盘 A–Z，驱动加密 */
+/* Listen to the physical keyboard A–Z and drive encryption. */
 export function usePhysicalKeyboard(
   onLetter: (letter: string) => void,
   enabled: boolean

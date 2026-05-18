@@ -1,6 +1,6 @@
 export const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-/* 真实 Enigma I 的德式 QWERTZ 三排布局 */
+/* The German QWERTZ three-row layout of the real Enigma I. */
 export const QWERTZ_ROWS: string[][] = [
   ['Q', 'W', 'E', 'R', 'T', 'Z', 'U', 'I', 'O'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K'],

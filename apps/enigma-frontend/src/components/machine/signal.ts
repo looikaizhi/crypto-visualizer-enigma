@@ -2,18 +2,36 @@ import type { EncryptResponse } from '../../services/api';
 
 export type StageKind = 'key' | 'plug' | 'rotor' | 'reflector' | 'lamp';
 
+export type StageLabelKey =
+  | 'signal.stage.key'
+  | 'signal.stage.plug'
+  | 'signal.stage.rotor'
+  | 'signal.stage.rotorPlain'
+  | 'signal.stage.reflector'
+  | 'signal.stage.lamp';
+
 export interface TraceStage {
-  label: string;
+  /** i18n key for the stage label; translated where the trace is rendered. */
+  labelKey: StageLabelKey;
+  /** Interpolation values for `labelKey` (e.g. the rotor model). */
+  labelParams?: Record<string, string>;
   kind: StageKind;
   letter: string;
 }
 
-const roman = (model: string, fallback: string) =>
-  model ? `转子 ${model}` : fallback;
+const rotorStage = (model: string, letter: string): TraceStage =>
+  model
+    ? {
+        labelKey: 'signal.stage.rotor',
+        labelParams: { model },
+        kind: 'rotor',
+        letter,
+      }
+    : { labelKey: 'signal.stage.rotorPlain', kind: 'rotor', letter };
 
 /**
- * 把一次加密的 API 结果拆成 11 段电流路径：
- * 键盘 → 插线板 → 转子×3 → 反射器 → 转子×3 → 插线板 → 灯板
+ * Split one encryption's API result into 11 current-path segments:
+ * keyboard -> plugboard -> rotors x3 -> reflector -> rotors x3 -> plugboard -> lampboard
  */
 export function buildTrace(
   plaintext: string,
@@ -32,22 +50,22 @@ export function buildTrace(
     return null;
   }
 
-  // forwardResult 顺序为 reversed(rotors) = [slot2, slot1, slot0]
+  // forwardResult order is reversed(rotors) = [slot2, slot1, slot0]
   const fLabels = [rotorModels[2], rotorModels[1], rotorModels[0]];
-  // backwardResult 顺序为 rotors = [slot0, slot1, slot2]
+  // backwardResult order is rotors = [slot0, slot1, slot2]
   const bLabels = [rotorModels[0], rotorModels[1], rotorModels[2]];
 
   return [
-    { label: '键盘', kind: 'key', letter: plaintext },
-    { label: '插线板', kind: 'plug', letter: plugResult[0] },
-    { label: roman(fLabels[0], '转子'), kind: 'rotor', letter: forwardResult[0].to },
-    { label: roman(fLabels[1], '转子'), kind: 'rotor', letter: forwardResult[1].to },
-    { label: roman(fLabels[2], '转子'), kind: 'rotor', letter: forwardResult[2].to },
-    { label: '反射器', kind: 'reflector', letter: backwardResult[0].from },
-    { label: roman(bLabels[0], '转子'), kind: 'rotor', letter: backwardResult[0].to },
-    { label: roman(bLabels[1], '转子'), kind: 'rotor', letter: backwardResult[1].to },
-    { label: roman(bLabels[2], '转子'), kind: 'rotor', letter: backwardResult[2].to },
-    { label: '插线板', kind: 'plug', letter: plugResult[1] },
-    { label: '灯板', kind: 'lamp', letter: ciphertext },
+    { labelKey: 'signal.stage.key', kind: 'key', letter: plaintext },
+    { labelKey: 'signal.stage.plug', kind: 'plug', letter: plugResult[0] },
+    rotorStage(fLabels[0], forwardResult[0].to),
+    rotorStage(fLabels[1], forwardResult[1].to),
+    rotorStage(fLabels[2], forwardResult[2].to),
+    { labelKey: 'signal.stage.reflector', kind: 'reflector', letter: backwardResult[0].from },
+    rotorStage(bLabels[0], backwardResult[0].to),
+    rotorStage(bLabels[1], backwardResult[1].to),
+    rotorStage(bLabels[2], backwardResult[2].to),
+    { labelKey: 'signal.stage.plug', kind: 'plug', letter: plugResult[1] },
+    { labelKey: 'signal.stage.lamp', kind: 'lamp', letter: ciphertext },
   ];
 }

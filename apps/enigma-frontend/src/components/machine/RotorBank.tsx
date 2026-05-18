@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Rotor from './Rotor';
 import Reflector from './Reflector';
 import type {
@@ -29,19 +30,20 @@ const RotorBank: React.FC<RotorBankProps> = ({
   onRingSettingChange,
   onReflectorChange,
 }) => {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
 
   return (
     <section className={`rotor-bank mat-wood${open ? ' rotor-bank--open' : ''}`}>
       <div className="rotor-bank-rim">
-        <span className="rotor-bank-title emboss">转子仓 · Walzenlage</span>
+        <span className="rotor-bank-title emboss">{t('rotorBank.title')}</span>
         <button
           type="button"
           className="lid-btn focus-brass"
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
         >
-          {open ? '合上盖板' : '掀盖 · 高级设置'}
+          {t(open ? 'rotorBank.cover.close' : 'rotorBank.cover.open')}
         </button>
       </div>
 

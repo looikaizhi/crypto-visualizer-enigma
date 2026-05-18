@@ -1,0 +1,351 @@
+.machine-core {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  border-radius: 8px;
+  background: var(--core-bg);
+  border: 1px solid #000;
+  box-shadow: var(--shadow-recessed);
+  overflow: hidden;
+}
+
+/* Title bar */
+.core-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 26px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--bakelite-raised), var(--bakelite));
+  border-bottom: 1px solid #000;
+}
+
+.core-title {
+  font-family: var(--font-plate);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  color: var(--brass-light);
+  text-shadow: none;
+}
+
+.core-legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-plate);
+  font-size: 10px;
+  color: var(--ink-muted);
+}
+
+.core-legend-fwd,
+.core-legend-back {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-left: 6px;
+}
+
+.core-legend-fwd {
+  background: var(--wire-forward);
+}
+
+.core-legend-back {
+  background: var(--wire-backward);
+}
+
+/* Top caps */
+.core-topcaps {
+  position: relative;
+  height: 52px;
+  flex-shrink: 0;
+}
+
+.core-cap {
+  position: absolute;
+  top: 4px;
+  height: 46px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 3px 4px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+}
+
+.core-cap-label {
+  font-family: var(--font-plate);
+  font-size: 10px;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.core-cap-line {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  width: 100%;
+  justify-content: center;
+}
+
+.core-cap-tag {
+  font-family: var(--font-plate);
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--brass-light);
+}
+
+.core-cap-select,
+.core-cap-ring {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--bakelite);
+  color: var(--ink);
+  border: 1px solid var(--brass-dark);
+  border-radius: 3px;
+  padding: 1px 2px;
+  max-width: 52px;
+}
+
+.core-cap-step {
+  width: 20px;
+  height: 20px;
+  font-size: 9px;
+  line-height: 1;
+  color: var(--ink);
+  background: var(--bakelite-raised);
+  border: 1px solid var(--brass-dark);
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.core-cap-step:hover {
+  filter: brightness(1.4);
+}
+
+.core-cap-window {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--lamp-glow);
+  min-width: 16px;
+  text-align: center;
+}
+
+/* Stage */
+.core-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.core-svg {
+  display: block;
+}
+
+.core-static-wire {
+  stroke: var(--wire-static);
+  stroke-width: 1;
+}
+
+/* Concentric ring chip */
+.core-chip-ring {
+  fill: rgba(0, 0, 0, 0.4);
+  stroke: var(--brass-dark);
+  stroke-width: 1.2;
+}
+
+.core-chip-inner {
+  fill: none;
+  stroke: var(--brass-dark);
+  stroke-width: 0.8;
+  opacity: 0.7;
+}
+
+.core-chip-ring-rot {
+  transition: transform var(--step-ms, 240ms) var(--ease-mech);
+}
+
+.core-chip-ring-rot--instant {
+  transition: none;
+}
+
+/* Step phase: subtle highlight on the chip to signal the rotor is advancing. */
+.machine-core[data-phase='stepping'] .core-chip-ring {
+  stroke: var(--brass-light);
+  stroke-width: 1.6;
+}
+
+.core-chip-tick {
+  stroke: var(--brass-light);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.core-chip-notch {
+  stroke: var(--notch);
+  stroke-width: 2;
+}
+
+.core-chip-letter {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  fill: var(--lamp-glow);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* Current path */
+.core-path {
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-dasharray: 6 7;
+  animation: core-flow 0.5s linear infinite;
+}
+
+.core-path--fwd {
+  stroke: var(--wire-forward);
+}
+
+.core-path--back {
+  stroke: var(--wire-backward);
+}
+
+@keyframes core-flow {
+  to {
+    stroke-dashoffset: -13;
+  }
+}
+
+.core-node {
+  animation: core-pop 220ms var(--ease-mech) backwards;
+}
+
+.core-node--fwd {
+  fill: var(--wire-forward);
+}
+
+.core-node--back {
+  fill: var(--wire-backward);
+}
+
+@keyframes core-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.core-bubble {
+  position: absolute;
+  transform: translate(-50%, -100%);
+  background: var(--bakelite-raised);
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--brass);
+  box-shadow: var(--shadow-raised);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.core-idle {
+  position: absolute;
+  left: 50%;
+  bottom: 14px;
+  transform: translateX(-50%);
+  font-family: var(--font-type);
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: center;
+  max-width: 80%;
+}
+
+/* Timeline */
+.core-timeline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  height: 34px;
+  padding: 0 12px;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, var(--bakelite-raised), var(--bakelite));
+  border-top: 1px solid #000;
+}
+
+.core-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.core-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #000;
+  border: 1px solid var(--brass-dark);
+  transition: background 140ms ease, box-shadow 140ms ease;
+}
+
+.core-dot--on {
+  background: var(--lamp-glow);
+  box-shadow: 0 0 6px var(--lamp-glow);
+}
+
+.core-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.core-btn {
+  font-family: var(--font-plate);
+  font-size: 11px;
+  color: var(--ink);
+  background: var(--bakelite-raised);
+  border: 1px solid var(--brass-dark);
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-height: 26px;
+  cursor: pointer;
+  transition: filter 120ms ease;
+}
+
+.core-btn:hover:not(:disabled) {
+  filter: brightness(1.4);
+}
+
+.core-btn--on {
+  background: var(--brass-dark);
+  color: var(--lamp-core);
+}
+
+.core-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.core-step-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink);
+  min-width: 34px;
+  text-align: center;
+}
