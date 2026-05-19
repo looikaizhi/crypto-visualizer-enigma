@@ -8,6 +8,28 @@
   stroke: rgba(212, 164, 92, 0.18);
   stroke-width: 1;
   fill: none;
+  transition: stroke 240ms ease;
+}
+
+/* Wire bundle rolls one row when its rotor steps, in sync with the chip. */
+.cc-wires {
+  transition: transform var(--step-ms, 300ms) var(--ease-mech);
+}
+
+.cc-wires--instant {
+  transition: none;
+}
+
+/* While the rotor is stepping, the active column's wiring brightens so the
+   internal-structure switch is visible. */
+.machine-core[data-phase='stepping'] .cc-wires--active .cc-wire {
+  stroke: rgba(244, 201, 119, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cc-wires {
+    transition: none;
+  }
 }
 
 .cc-wire--plugged {

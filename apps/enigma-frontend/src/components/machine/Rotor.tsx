@@ -54,7 +54,12 @@ const Rotor: React.FC<RotorProps> = ({
               </span>
             ))}
           </div>
-          <div className="rotor-window-frame" aria-hidden="true" />
+          {/* key on position re-mounts the frame so its flash replays on every step */}
+          <div
+            className="rotor-window-frame"
+            aria-hidden="true"
+            key={rotor.position || 'A'}
+          />
         </div>
         <div className="rotor-knurl" aria-hidden="true" />
       </div>
@@ -68,7 +73,9 @@ const Rotor: React.FC<RotorProps> = ({
         >
           ▲
         </button>
-        <span className="rotor-pos-label engrave">{rotor.position || 'A'}</span>
+        <span className="rotor-pos-label engrave" key={rotor.position || 'A'}>
+          {rotor.position || 'A'}
+        </span>
         <button
           type="button"
           className="rotor-arrow focus-brass"

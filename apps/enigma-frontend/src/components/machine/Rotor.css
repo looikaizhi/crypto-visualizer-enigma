@@ -75,6 +75,18 @@
   border-top: 1px solid var(--brass);
   border-bottom: 1px solid var(--brass);
   box-shadow: 0 0 12px rgba(232, 199, 122, 0.35);
+  /* Flashes once each time the rotor advances (frame is re-keyed on step). */
+  animation: rotor-tick-flash 400ms var(--ease-out);
+}
+
+@keyframes rotor-tick-flash {
+  0% {
+    box-shadow: 0 0 22px 6px rgba(232, 199, 122, 0.8);
+    border-color: var(--brass-light);
+  }
+  100% {
+    box-shadow: 0 0 12px rgba(232, 199, 122, 0.35);
+  }
 }
 
 .rotor-knurl {
@@ -121,6 +133,24 @@
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 14px;
+  animation: rotor-pos-flash 400ms var(--ease-out);
+}
+
+@keyframes rotor-pos-flash {
+  0% {
+    color: var(--lamp-core);
+    text-shadow: 0 0 12px var(--lamp-glow), 0 0 4px var(--lamp-glow);
+  }
+  100% {
+    text-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotor-window-frame::after,
+  .rotor-pos-label {
+    animation: none;
+  }
 }
 
 .rotor-field {

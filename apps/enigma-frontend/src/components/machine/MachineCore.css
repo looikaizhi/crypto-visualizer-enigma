@@ -202,30 +202,68 @@
   dominant-baseline: central;
 }
 
+/* Step pulse: a glow ring flashes on the rotor chip that just advanced.
+   Animates stroke-width/opacity only (no transform) so it never disturbs
+   the chip's rotation. */
+.core-chip-pulse {
+  fill: none;
+  stroke: var(--lamp-glow);
+  pointer-events: none;
+  filter: drop-shadow(0 0 4px var(--lamp-glow));
+  animation: core-chip-flash 360ms var(--ease-out) forwards;
+}
+
+/* Carry step (middle/slow rotor advances) — the key Enigma moment. */
+.core-chip-pulse--carry {
+  stroke: var(--signal-live);
+  filter: drop-shadow(0 0 6px var(--signal-live));
+  animation-duration: 480ms;
+}
+
+@keyframes core-chip-flash {
+  0% {
+    stroke-width: 6;
+    opacity: 0.95;
+  }
+  100% {
+    stroke-width: 0;
+    opacity: 0;
+  }
+}
+
 /* Current path */
 .core-path {
   fill: none;
   stroke-width: 2.4;
   stroke-linecap: round;
-  stroke-dasharray: 6 7;
-  animation: core-flow 0.5s linear infinite;
+  /* Draw-on: the line grows from a -> b instead of appearing instantly.
+     pathLength=1 on the element normalises the length so 1 == full path. */
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: core-draw var(--draw-ms, 200ms) var(--ease-out) forwards;
 }
 
 .core-path--fwd {
   stroke: var(--wire-forward);
+  filter: drop-shadow(0 0 2.5px var(--wire-forward));
 }
 
 .core-path--back {
   stroke: var(--wire-backward);
+  filter: drop-shadow(0 0 2.5px var(--wire-backward));
 }
 
-@keyframes core-flow {
+@keyframes core-draw {
   to {
-    stroke-dashoffset: -13;
+    stroke-dashoffset: 0;
   }
 }
 
 .core-node {
+  /* Scale around the circle's own centre, not the SVG origin, so core-pop
+     is a pure in-place pop with no positional drift. */
+  transform-box: fill-box;
+  transform-origin: center;
   animation: core-pop 220ms var(--ease-mech) backwards;
 }
 
@@ -240,12 +278,15 @@
 @keyframes core-pop {
   0% {
     transform: scale(0.4);
+    opacity: 0;
   }
   60% {
     transform: scale(1.18);
+    opacity: 1;
   }
   100% {
     transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -348,4 +389,17 @@
   color: var(--ink);
   min-width: 34px;
   text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .core-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+  .core-node {
+    animation: none;
+  }
+  .core-chip-pulse {
+    display: none;
+  }
 }

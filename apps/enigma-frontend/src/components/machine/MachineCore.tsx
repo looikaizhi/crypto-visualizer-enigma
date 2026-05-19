@@ -41,7 +41,7 @@ interface MachineCoreProps {
 const ROTOR_MODELS = ['I', 'II', 'III', 'IV', 'V'];
 const SPEED_MS: Record<'normal' | 'slow', number> = { normal: 200, slow: 620 };
 /* Step phase duration: current flow begins only after this delay. */
-const STEP_MS: Record<'normal' | 'slow', number> = { normal: 240, slow: 700 };
+const STEP_MS: Record<'normal' | 'slow', number> = { normal: 300, slow: 700 };
 const TICK_DEG = 360 / 26;
 const PAD = 6;
 const GAP = 10;
@@ -83,7 +83,10 @@ const MachineCore: React.FC<MachineCoreProps> = ({
   const { t } = useTranslation();
   const stageRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 900, h: 420 });
-  const [revealed, setRevealed] = useState(0);
+  /* drawnSegs: number of revealed path segments (0..17). */
+  const [drawnSegs, setDrawnSegs] = useState(0);
+  /* finalDone: the last segment has finished its draw-on animation. */
+  const [finalDone, setFinalDone] = useState(false);
   const [replay, setReplay] = useState(0);
   const [phase, setPhase] = useState<'idle' | 'stepping' | 'flowing'>('idle');
   const [hover, setHover] = useState<{
@@ -99,11 +102,41 @@ const MachineCore: React.FC<MachineCoreProps> = ({
      delta per change to avoid a full Z->A backspin. */
   const [chipRot, setChipRot] = useState<number[]>([0, 0, 0]);
   const [noChipTransition, setNoChipTransition] = useState(false);
+  /* Chip step pulse: which chips just advanced + a key to re-trigger the
+     CSS flash animation on each new step. */
+  const [chipPulse, setChipPulse] = useState<{ slots: boolean[]; key: number }>({
+    slots: [false, false, false],
+    key: 0,
+  });
+  /* Wire roll: transient per-slot offset (in row units) that animates the
+     intra-column wiring bundle from its old mapping into the new one. */
+  const [wireRoll, setWireRoll] = useState<number[]>([0, 0, 0]);
+  const [noWireTransition, setNoWireTransition] = useState(false);
   const prevPosRef = useRef<string[]>(rotors.map((r) => r?.position || 'A'));
   const lastStepDeltaRef = useRef<number[]>([0, 0, 0]);
+  const lastStepRowsRef = useRef<number[]>([0, 0, 0]);
   const posKey = rotors.map((r) => r?.position || 'A').join('');
 
-  useEffect(() => {
+  /* Roll the stepped columns' wiring: jump to the old mapping (no transition),
+     then transition back to 0 to reveal the new mapping. Only single-step
+     (|delta| === 1) advances roll; larger jumps snap. */
+  const rollWires = (deltas: number[]) => {
+    if (prefersReducedMotion()) return;
+    const offsets = deltas.map((d) => (Math.abs(d) === 1 ? d : 0));
+    if (offsets.every((d) => d === 0)) return;
+    setNoWireTransition(true);
+    setWireRoll(offsets);
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        setNoWireTransition(false);
+        setWireRoll([0, 0, 0]);
+      })
+    );
+  };
+
+  /* useLayoutEffect so the wire-roll's instant-offset frame is applied before
+     the browser paints (no 1-frame flash of the final mapping). */
+  useLayoutEffect(() => {
     const cur = rotors.map((r) => r?.position || 'A');
     const prev = prevPosRef.current;
     const deltas = [0, 1, 2].map((slot) => {
@@ -113,7 +146,13 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     });
     if (deltas.some((d) => d !== 0)) {
       lastStepDeltaRef.current = deltas.map((d) => d * TICK_DEG);
+      lastStepRowsRef.current = deltas;
       setChipRot((r) => r.map((deg, slot) => deg + deltas[slot] * TICK_DEG));
+      setChipPulse((p) => ({
+        slots: deltas.map((d) => d !== 0),
+        key: p.key + 1,
+      }));
+      rollWires(deltas);
     }
     prevPosRef.current = cur;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,35 +233,40 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     ];
   }, [trace]);
 
-  /* Step -> flow animation */
+  /* Step -> flow animation. drawnSegs counts revealed path segments (0..17),
+     advancing one per tick so each segment draws in strict sequence. */
   useEffect(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     if (stepTimerRef.current) clearTimeout(stepTimerRef.current);
     if (!trace) {
-      setRevealed(0);
+      setDrawnSegs(0);
+      setFinalDone(false);
       setPhase('idle');
       return;
     }
     const reduced = prefersReducedMotion();
-    setRevealed(0);
+    const segTotal = trace.length >= 11 ? 17 : 0;
+    setDrawnSegs(0);
+    setFinalDone(false);
     setPhase('stepping');
 
     /* Reveal the current path only after the step phase ends. */
     const startFlow = () => {
       setPhase('flowing');
       if (reduced) {
-        setRevealed(trace.length);
+        setDrawnSegs(segTotal);
+        setFinalDone(true);
         return;
       }
       if (stepMode) {
-        setRevealed(1);
+        setDrawnSegs(1);
         return;
       }
       let n = 0;
       timerRef.current = setInterval(() => {
         n += 1;
-        setRevealed(n);
-        if (n >= trace.length && timerRef.current) {
+        setDrawnSegs(n);
+        if (n >= segTotal && timerRef.current) {
           clearInterval(timerRef.current);
           timerRef.current = null;
         }
@@ -241,9 +285,11 @@ const MachineCore: React.FC<MachineCoreProps> = ({
   }, [trace, traceVersion, speed, stepMode, replay]);
 
   const total = trace ? trace.length : 0;
-  const visibleSegs = total
-    ? Math.round((revealed / total) * (pathPoints.length - 1))
-    : 0;
+  const segCount = pathPoints.length > 1 ? pathPoints.length - 1 : 0;
+  const lastSeg = segCount - 1;
+  const visibleSegs = Math.min(drawnSegs, segCount);
+  /* revealed: trace-stage progress (0..total), derived for the 11-dot timeline. */
+  const revealed = segCount ? Math.round((visibleSegs / segCount) * total) : 0;
 
   const coord = (p: PathPoint) => ({
     x: p.side === 'L' ? geo.leftX(p.col) : geo.rightX(p.col),
@@ -267,14 +313,28 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     }
   }
 
-  /* Current path segments */
+  /* Current path segments (each grows from a -> b via stroke-dashoffset) */
   const segs: React.ReactNode[] = [];
   const nodes: React.ReactNode[] = [];
+  /* Draw duration is shorter than the per-segment tick interval, so each
+     segment snaps in then holds — punctuated reveal, no continuous glide. */
+  const drawMs = Math.round(SPEED_MS[speed] * 0.55);
+  const drawStyle = {
+    '--draw-ms': `${drawMs}ms`,
+  } as React.CSSProperties;
   for (let s = 0; s < visibleSegs && s < pathPoints.length - 1; s++) {
     const a = coord(pathPoints[s]);
     const b = coord(pathPoints[s + 1]);
     const isReflect = s === 8;
     const dir = s < 9 ? 'fwd' : 'back';
+    /* The arrowhead is shown only once a segment has finished drawing, so it
+       never floats ahead of the still-growing line. The newest segment is the
+       one currently animating; everything before it is done. */
+    const showArrow = s <= visibleSegs - 2 || (s === lastSeg && finalDone);
+    const markerId = showArrow ? `url(#arrow-${dir})` : undefined;
+    const handleEnd = () => {
+      if (s === lastSeg) setFinalDone(true);
+    };
     if (isReflect) {
       const bulge = Math.max(a.x, b.x) + Math.min(40, geo.colW * 0.5);
       segs.push(
@@ -282,7 +342,10 @@ const MachineCore: React.FC<MachineCoreProps> = ({
           key={`seg${s}`}
           d={`M ${a.x} ${a.y} C ${bulge} ${a.y} ${bulge} ${b.y} ${b.x} ${b.y}`}
           className={`core-path core-path--${dir}`}
-          markerEnd="url(#arrow-fwd)"
+          pathLength={1}
+          style={drawStyle}
+          markerEnd={markerId}
+          onAnimationEnd={handleEnd}
         />
       );
     } else {
@@ -294,7 +357,10 @@ const MachineCore: React.FC<MachineCoreProps> = ({
           x2={b.x}
           y2={b.y}
           className={`core-path core-path--${dir}`}
-          markerEnd={dir === 'fwd' ? 'url(#arrow-fwd)' : 'url(#arrow-back)'}
+          pathLength={1}
+          style={drawStyle}
+          markerEnd={markerId}
+          onAnimationEnd={handleEnd}
         />
       );
     }
@@ -308,6 +374,8 @@ const MachineCore: React.FC<MachineCoreProps> = ({
         cy={c.y}
         r={5}
         className={`core-node core-node--${s < 9 ? 'fwd' : 'back'}`}
+        /* Destination nodes pop only when the drawing line reaches them. */
+        style={{ animationDelay: s === 0 ? '0ms' : `${drawMs}ms` }}
       />
     );
   }
@@ -402,6 +470,17 @@ const MachineCore: React.FC<MachineCoreProps> = ({
         <text x={cx} y={cy} className="core-chip-letter">
           {rotor.position || 'A'}
         </text>
+        {chipPulse.slots[slot] && (
+          <circle
+            key={chipPulse.key}
+            cx={cx}
+            cy={cy}
+            r={R}
+            className={`core-chip-pulse${
+              slot !== 0 ? ' core-chip-pulse--carry' : ''
+            }`}
+          />
+        )}
       </g>
     );
   };
@@ -493,8 +572,11 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     );
   };
 
-  const stepBack = () => setRevealed((r) => Math.max(1, r - 1));
-  const stepFwd = () => setRevealed((r) => Math.min(total, r + 1));
+  const stepBack = () => {
+    setDrawnSegs((r) => Math.max(1, r - 1));
+    setFinalDone(false);
+  };
+  const stepFwd = () => setDrawnSegs((r) => Math.min(segCount, r + 1));
 
   /* Replay: instantly snap the chip back one notch, then re-run STEP + FLOW. */
   const handleReplay = () => {
@@ -502,12 +584,14 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     if (delta.some((d) => d !== 0) && !prefersReducedMotion()) {
       setNoChipTransition(true);
       setChipRot((r) => r.map((deg, slot) => deg - delta[slot]));
+      setChipPulse((p) => ({ ...p, key: p.key + 1 }));
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
           setNoChipTransition(false);
           setChipRot((r) => r.map((deg, slot) => deg + delta[slot]));
         })
       );
+      rollWires(lastStepRowsRef.current);
     }
     setReplay((r) => r + 1);
   };
@@ -516,6 +600,7 @@ const MachineCore: React.FC<MachineCoreProps> = ({
     <section
       className="machine-core"
       data-phase={phase}
+      style={{ '--step-ms': `${STEP_MS[speed]}ms` } as React.CSSProperties}
       aria-label={t('core.aria')}
     >
       <div className="core-titlebar">
@@ -564,24 +649,31 @@ const MachineCore: React.FC<MachineCoreProps> = ({
 
           <g className="core-static-wires">{staticWires}</g>
 
-          {COL_IDS.map((colId, c) => (
-            <ContactColumn
-              key={colId}
-              id={colId}
-              ref={(h) => {
-                colRefs.current[c] = h;
-              }}
-              x={geo.colX(c)}
-              width={geo.colW}
-              contactsTop={geo.contactsTop}
-              contactsHeight={geo.contactsHeight}
-              mapping={mappings[colId]}
-              leftLabels={ALPHA}
-              rightLabels={colId === 'UKW' ? undefined : ALPHA}
-              onContactHover={(side, i) => setHover({ col: c, side, i })}
-              onContactLeave={() => setHover(null)}
-            />
-          ))}
+          {COL_IDS.map((colId, c) => {
+            const isRotorCol = colId !== 'PB' && colId !== 'UKW';
+            const slot = SLOT_OF[c];
+            return (
+              <ContactColumn
+                key={colId}
+                id={colId}
+                ref={(h) => {
+                  colRefs.current[c] = h;
+                }}
+                x={geo.colX(c)}
+                width={geo.colW}
+                contactsTop={geo.contactsTop}
+                contactsHeight={geo.contactsHeight}
+                mapping={mappings[colId]}
+                leftLabels={ALPHA}
+                rightLabels={colId === 'UKW' ? undefined : ALPHA}
+                rollRows={isRotorCol ? wireRoll[slot] : 0}
+                rollInstant={noWireTransition}
+                active={isRotorCol ? chipPulse.slots[slot] : false}
+                onContactHover={(side, i) => setHover({ col: c, side, i })}
+                onContactLeave={() => setHover(null)}
+              />
+            );
+          })}
 
           <g className="core-chips">
             {renderChip(1, 2)}
@@ -617,19 +709,19 @@ const MachineCore: React.FC<MachineCoreProps> = ({
                 type="button"
                 className="core-btn focus-brass"
                 onClick={stepBack}
-                disabled={!trace || revealed <= 1}
+                disabled={!trace || drawnSegs <= 1}
                 aria-label={t('core.nav.prev')}
               >
                 ◀
               </button>
               <span className="core-step-count">
-                {revealed}/{total || 11}
+                {drawnSegs}/{segCount || 17}
               </span>
               <button
                 type="button"
                 className="core-btn focus-brass"
                 onClick={stepFwd}
-                disabled={!trace || revealed >= total}
+                disabled={!trace || drawnSegs >= segCount}
                 aria-label={t('core.nav.next')}
               >
                 ▶

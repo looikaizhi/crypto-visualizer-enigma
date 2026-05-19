@@ -17,6 +17,12 @@ interface ContactColumnProps {
   mapping: number[];
   leftLabels: string[];
   rightLabels?: string[];
+  /* Wire-roll offset in row units (rotor columns only). */
+  rollRows?: number;
+  /* Disable the roll transition for the instant-offset frame. */
+  rollInstant?: boolean;
+  /* This column's rotor stepped this round (drives the step-time highlight). */
+  active?: boolean;
   onContactHover?: (side: 'L' | 'R', i: number) => void;
   onContactLeave?: () => void;
 }
@@ -24,6 +30,8 @@ interface ContactColumnProps {
 const DOT_R = 3;
 const HIT_R = 11;
 const EDGE = 13;
+/* Extra wrapped rows above/below so the periodic wire bundle rolls seamlessly. */
+const WRAP = 3;
 
 const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
   (
@@ -36,6 +44,9 @@ const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
       mapping,
       leftLabels,
       rightLabels,
+      rollRows = 0,
+      rollInstant = false,
+      active = false,
       onContactHover,
       onContactLeave,
     },
@@ -43,6 +54,8 @@ const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
   ) => {
     const { t } = useTranslation();
     const isReflector = id === 'UKW';
+    /* Rotor columns (R1/R2/R3) get the periodic, rollable wire bundle. */
+    const isRotor = !isReflector && id !== 'PB';
     const rowH = contactsHeight / 26;
     const leftX = x + EDGE;
     const rightX = x + width - EDGE;
@@ -78,6 +91,24 @@ const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
             />
           );
         }
+      } else if (isRotor) {
+        /* Periodic bundle: rows -WRAP..25+WRAP, period 26. Each wire keeps a
+           fixed row delta so wrapped copies stay parallel — translating by
+           one rowH then clipping gives a seamless roll. */
+        for (let i = -WRAP; i < 26 + WRAP; i++) {
+          const m = ((i % 26) + 26) % 26;
+          const d = mapping[m] - m;
+          out.push(
+            <line
+              key={`w${i}`}
+              x1={leftX}
+              y1={yOf(i)}
+              x2={rightX}
+              y2={yOf(i + d)}
+              className="cc-wire"
+            />
+          );
+        }
       } else {
         for (let i = 0; i < 26; i++) {
           const j = mapping[i];
@@ -96,12 +127,22 @@ const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
       }
       return out;
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, isReflector, mapping, leftX, rightX, contactsTop, rowH, width]);
+    }, [id, isReflector, isRotor, mapping, leftX, rightX, contactsTop, rowH, width]);
 
     const rows = Array.from({ length: 26 }, (_, i) => i);
 
     return (
       <g className="cc-group" data-col={id}>
+        {isRotor && (
+          <clipPath id={`cc-clip-${id}`}>
+            <rect
+              x={x}
+              y={contactsTop - 4}
+              width={width}
+              height={contactsHeight + 8}
+            />
+          </clipPath>
+        )}
         <rect
           x={x}
           y={contactsTop - 4}
@@ -110,7 +151,18 @@ const ContactColumn = forwardRef<ContactColumnHandle, ContactColumnProps>(
           rx={6}
           className="cc-bg"
         />
-        <g className="cc-wires">{wires}</g>
+        <g clipPath={isRotor ? `url(#cc-clip-${id})` : undefined}>
+          <g
+            className={`cc-wires${active ? ' cc-wires--active' : ''}${
+              rollInstant ? ' cc-wires--instant' : ''
+            }`}
+            transform={
+              isRotor ? `translate(0 ${rollRows * rowH})` : undefined
+            }
+          >
+            {wires}
+          </g>
+        </g>
 
         {/* Left contacts + labels */}
         {rows.map((i) => (
